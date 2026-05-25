@@ -1,0 +1,23 @@
+# Build output
+/build/
+
+# CMake generated files
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/compile_commands.json
+
+# Firmware artifacts
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+
+# Editor workspace (keep shared tasks)
+.vscode/*
+!.vscode/tasks.json
+
+# OS files
+.DS_Store
+Thumbs.db

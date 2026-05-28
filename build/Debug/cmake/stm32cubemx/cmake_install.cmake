@@ -1,4 +1,4 @@
-# Install script for directory: D:/vscode_other/TEST11/cmake/stm32cubemx
+# Install script for directory: D:/CUBEproject/TEST11_new/cmake/stm32cubemx
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,12 +34,12 @@ endif()
 
 # Set path to fallback-tool for dependency-resolution.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "C:/Program Files (x86)/Arm/GNU Toolchain mingw-w64-i686-arm-none-eabi/bin/arm-none-eabi-objdump.exe")
+  set(CMAKE_OBJDUMP "C:/arm-tools/xpack-arm-none-eabi-gcc-13.3.1-1.1/bin/arm-none-eabi-objdump.exe")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "D:/vscode_other/TEST11/build/Debug/cmake/stm32cubemx/install_local_manifest.txt"
+  file(WRITE "D:/CUBEproject/TEST11_new/build/Debug/cmake/stm32cubemx/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

@@ -1,57 +1,37 @@
 #include "main.h"
 #include "gpio.h"
-#include <stdint.h>
-#include <string.h>
 #include "uart.h"
+#include "key.h"
 
 static void SystemClock_Config(void);
-static uint8_t ProcessCommand(const char *rx_buf);
 
 int main(void)
 {
   HAL_Init();
   SystemClock_Config();
   MX_GPIO_Init();
+  key_init();
   UART1_Init();
 
-  char rx_buf[16] = {0};
-  uint8_t rx_idx = 0;
-  uint8_t ch = 0;
+  UART1_SendString("System ready. Press KEY1 / KEY2 / KEY3.\r\n");
 
   while (1)
   {
-    if (UART1_ReceiveByte(&ch))
-    {
-      if (rx_idx < (sizeof(rx_buf) - 1U))
-      {
-        rx_buf[rx_idx++] = (char)ch;
-        rx_buf[rx_idx] = '\0';
+    uint8_t key = key_scan(0);
 
-        if (ProcessCommand(rx_buf) != 0U)
-        {
-          rx_idx = 0;
-          rx_buf[0] = '\0';
-        }
-      }
+    if (key == KEY1_PRES)
+    {
+      UART1_SendString("KEY1 pressed\r\n");
+    }
+    else if (key == KEY2_PRES)
+    {
+      UART1_SendString("KEY2 pressed\r\n");
+    }
+    else if (key == KEY3_PRES)
+    {
+      UART1_SendString("KEY3 pressed\r\n");
     }
   }
-}
-
-static uint8_t ProcessCommand(const char *rx_buf)
-{
-  if (strcmp(rx_buf, "LED1 ON") == 0)
-  {
-    HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_GPIO_PIN, GPIO_PIN_RESET);
-    return 1;
-  }
-
-  if (strcmp(rx_buf, "LED1 OFF") == 0)
-  {
-    HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_GPIO_PIN, GPIO_PIN_SET);
-    return 1;
-  }
-
-  return 0;
 }
 
 static void SystemClock_Config(void)

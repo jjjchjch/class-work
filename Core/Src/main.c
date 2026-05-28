@@ -3,9 +3,11 @@
 #include <stdint.h>
 #include <string.h>
 #include "uart.h"
+#include "key.h"
 
 static void SystemClock_Config(void);
 static uint8_t ProcessCommand(const char *rx_buf);
+static void HandleKeyPress(uint8_t key_code);
 
 int main(void)
 {
@@ -13,25 +15,59 @@ int main(void)
   SystemClock_Config();
   MX_GPIO_Init();
   UART1_Init();
+  key_init();
 
-  char rx_buf[16] = {0};
+  char rx_buf[32] = {0};
   uint8_t rx_idx = 0;
   uint8_t ch = 0;
+  uint8_t key_val = 0;
+  uint32_t last_key_time = 0;
+
+  UART1_SendString("\r\n========== Serial Communication Test ==========\r\n");
+  UART1_SendString("Commands: LED1 ON/OFF, LED2 ON/OFF, LED3 ON/OFF\r\n");
+  UART1_SendString("Press KEY1/KEY2/KEY3 to send key info via UART\r\n");
+  UART1_SendString("================================================\r\n\r\n");
 
   while (1)
   {
+    /* ============ Receive and Echo ============ */
     if (UART1_ReceiveByte(&ch))
     {
-      if (rx_idx < (sizeof(rx_buf) - 1U))
-      {
-        rx_buf[rx_idx++] = (char)ch;
-        rx_buf[rx_idx] = '\0';
+      /* Echo the received character */
+      char echo_msg[2] = {ch, '\0'};
+      UART1_SendString(echo_msg);
 
-        if (ProcessCommand(rx_buf) != 0U)
+      /* Check for command terminator (Enter/CR/LF) */
+      if (ch == '\r' || ch == '\n')
+      {
+        if (rx_idx > 0)
         {
+          /* Process the command */
+          ProcessCommand(rx_buf);
+          /* Clear buffer */
           rx_idx = 0;
           rx_buf[0] = '\0';
         }
+        /* Send newline for formatting */
+        UART1_SendString("\r\n");
+      }
+      else if (rx_idx < (sizeof(rx_buf) - 1U))
+      {
+        /* Add character to buffer */
+        rx_buf[rx_idx++] = (char)ch;
+        rx_buf[rx_idx] = '\0';
+      }
+    }
+
+    /* ============ Key Scanning ============ */
+    key_val = key_scan(0);
+    if (key_val != 0)
+    {
+      /* Debounce: avoid multiple detections */
+      if ((HAL_GetTick() - last_key_time) > 200)
+      {
+        HandleKeyPress(key_val);
+        last_key_time = HAL_GetTick();
       }
     }
   }
@@ -39,19 +75,81 @@ int main(void)
 
 static uint8_t ProcessCommand(const char *rx_buf)
 {
-  if (strcmp(rx_buf, "LED1 ON") == 0)
+  if (rx_buf == NULL || strlen(rx_buf) == 0)
   {
-    HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_GPIO_PIN, GPIO_PIN_RESET);
-    return 1;
+    return 0;
   }
 
-  if (strcmp(rx_buf, "LED1 OFF") == 0)
+  /* Check for LED1 commands using strstr() */
+  if (strstr(rx_buf, "LED1") != NULL)
   {
-    HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_GPIO_PIN, GPIO_PIN_SET);
-    return 1;
+    if (strstr(rx_buf, "ON") != NULL)
+    {
+      HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_GPIO_PIN, GPIO_PIN_RESET);
+      UART1_SendString("[INFO] LED1 is now ON\r\n");
+      return 1;
+    }
+    else if (strstr(rx_buf, "OFF") != NULL)
+    {
+      HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_GPIO_PIN, GPIO_PIN_SET);
+      UART1_SendString("[INFO] LED1 is now OFF\r\n");
+      return 1;
+    }
+  }
+
+  /* Check for LED2 commands using strstr() */
+  if (strstr(rx_buf, "LED2") != NULL)
+  {
+    if (strstr(rx_buf, "ON") != NULL)
+    {
+      HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_GPIO_PIN, GPIO_PIN_RESET);
+      UART1_SendString("[INFO] LED2 is now ON\r\n");
+      return 1;
+    }
+    else if (strstr(rx_buf, "OFF") != NULL)
+    {
+      HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_GPIO_PIN, GPIO_PIN_SET);
+      UART1_SendString("[INFO] LED2 is now OFF\r\n");
+      return 1;
+    }
+  }
+
+  /* Check for LED3 commands using strstr() */
+  if (strstr(rx_buf, "LED3") != NULL)
+  {
+    if (strstr(rx_buf, "ON") != NULL)
+    {
+      HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_GPIO_PIN, GPIO_PIN_RESET);
+      UART1_SendString("[INFO] LED3 is now ON\r\n");
+      return 1;
+    }
+    else if (strstr(rx_buf, "OFF") != NULL)
+    {
+      HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_GPIO_PIN, GPIO_PIN_SET);
+      UART1_SendString("[INFO] LED3 is now OFF\r\n");
+      return 1;
+    }
   }
 
   return 0;
+}
+
+static void HandleKeyPress(uint8_t key_code)
+{
+  switch (key_code)
+  {
+    case KEY1_PRES:
+      UART1_SendString("[KEY] KEY1 Pressed\r\n");
+      break;
+    case KEY2_PRES:
+      UART1_SendString("[KEY] KEY2 Pressed\r\n");
+      break;
+    case KEY3_PRES:
+      UART1_SendString("[KEY] KEY3 Pressed\r\n");
+      break;
+    default:
+      break;
+  }
 }
 
 static void SystemClock_Config(void)

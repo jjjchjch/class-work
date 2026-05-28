@@ -1,0 +1,3 @@
+D:/vscode_other/TEST11/Core/Src/key.c:20:6:key_init	40	static
+D:/vscode_other/TEST11/Core/Src/key.c:55:9:key_scan	16	static
+D:/vscode_other/TEST11/Core/Src/key.c:102:6:key_exti_init	40	static

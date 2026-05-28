@@ -1,0 +1,5 @@
+D:/vscode_other/TEST11/Core/Src/gpio.c:26:6:LED_On	16	static
+D:/vscode_other/TEST11/Core/Src/gpio.c:31:6:LED_Off	16	static
+D:/vscode_other/TEST11/Core/Src/gpio.c:36:6:LED_Toggle	16	static
+D:/vscode_other/TEST11/Core/Src/gpio.c:41:6:LED_Init	40	static
+D:/vscode_other/TEST11/Core/Src/gpio.c:78:6:MX_GPIO_Init	8	static

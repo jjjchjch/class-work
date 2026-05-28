@@ -56,6 +56,8 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern TIM_HandleTypeDef htim4;
+extern TIM_HandleTypeDef htim5;
 
 /* USER CODE BEGIN EV */
 
@@ -202,12 +204,12 @@ void SysTick_Handler(void)
 /* USER CODE BEGIN 1 */
 
 /**
- * @brief  EXTI9_5 ÖÐ¶Ï´¦Àíº¯Êý ¡ª EC11 CLK(PA7) ÏÂ½µÑØ
- *         NVIC: EXTI9_5_IRQn£¬ÇÀÕ¼ÓÅÏÈ¼¶ 1£¨×î¸ß£©
+ * @brief  EXTI9_5 ï¿½Ð¶Ï´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ EC11 CLK(PA7) ï¿½Â½ï¿½ï¿½ï¿½
+ *         NVIC: EXTI9_5_IRQnï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½È¼ï¿½ 1ï¿½ï¿½ï¿½ï¿½ß£ï¿½
  *
- *         CLK ÏÂ½µÑØÊ±¶ÁÈ¡ DT(PA6) ÅÐ¶ÏÐý×ª·½Ïò:
- *           DT = 1 (HIGH) ¡ú Õý×ª ¡ú ÇÐ»» LED1 (PC5)
- *           DT = 0 (LOW)  ¡ú Äæ×ª ¡ú ÇÐ»» LED2 (PB1)
+ *         CLK ï¿½Â½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½È¡ DT(PA6) ï¿½Ð¶ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½:
+ *           DT = 1 (HIGH) ï¿½ï¿½ ï¿½ï¿½×ª ï¿½ï¿½ ï¿½Ð»ï¿½ LED1 (PC5)
+ *           DT = 0 (LOW)  ï¿½ï¿½ ï¿½ï¿½×ª ï¿½ï¿½ ï¿½Ð»ï¿½ LED2 (PB1)
  */
 void EXTI9_5_IRQHandler(void)
 {
@@ -215,16 +217,16 @@ void EXTI9_5_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(ENC_CLK_GPIO_PIN))
     {
-        if (HAL_GetTick() - last_tick > 5U)   /* Ïû¶¶: 5 ms£¨±àÂëÆ÷Ïû¶¶´°¿ÚÐ¡£© */
+        if (HAL_GetTick() - last_tick > 5U)   /* ï¿½ï¿½ï¿½ï¿½: 5 msï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ */
         {
             last_tick = HAL_GetTick();
             if (HAL_GPIO_ReadPin(ENC_DT_GPIO_PORT, ENC_DT_GPIO_PIN) == GPIO_PIN_SET)
             {
-                HAL_GPIO_TogglePin(LED1_GPIO_PORT, LED1_GPIO_PIN);  /* Õý×ª ¡ú LED1 */
+                HAL_GPIO_TogglePin(LED1_GPIO_PORT, LED1_GPIO_PIN);  /* ï¿½ï¿½×ª ï¿½ï¿½ LED1 */
             }
             else
             {
-                HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_GPIO_PIN);  /* Äæ×ª ¡ú LED2 */
+                HAL_GPIO_TogglePin(LED2_GPIO_PORT, LED2_GPIO_PIN);  /* ï¿½ï¿½×ª ï¿½ï¿½ LED2 */
             }
         }
         __HAL_GPIO_EXTI_CLEAR_IT(ENC_CLK_GPIO_PIN);
@@ -232,11 +234,11 @@ void EXTI9_5_IRQHandler(void)
 }
 
 /**
- * @brief  EXTI4 ÖÐ¶Ï´¦Àíº¯Êý ¡ª EC11 SW(PC4) °´ÏÂ
- *         NVIC: EXTI4_IRQn£¬ÇÀÕ¼ÓÅÏÈ¼¶ 2£¨´Î¼¶£©
- *         CLK ISR ¿ÉÇÀÕ¼±¾ ISR£»±¾ ISR ²»ÄÜÇÀÕ¼ CLK ISR
+ * @brief  EXTI4 ï¿½Ð¶Ï´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ EC11 SW(PC4) ï¿½ï¿½ï¿½ï¿½
+ *         NVIC: EXTI4_IRQnï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½È¼ï¿½ 2ï¿½ï¿½ï¿½Î¼ï¿½ï¿½ï¿½
+ *         CLK ISR ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ ISRï¿½ï¿½ï¿½ï¿½ ISR ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ CLK ISR
  *
- *         SW °´ÏÂ£¨µÍµçÆ½£©¡ú ÇÐ»» LED3 (PB2)
+ *         SW ï¿½ï¿½ï¿½Â£ï¿½ï¿½Íµï¿½Æ½ï¿½ï¿½ï¿½ï¿½ ï¿½Ð»ï¿½ LED3 (PB2)
  */
 void EXTI4_IRQHandler(void)
 {
@@ -244,13 +246,23 @@ void EXTI4_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(ENC_SW_GPIO_PIN))
     {
-        if (HAL_GetTick() - last_tick > 200U)   /* Ïû¶¶: 200 ms */
+        if (HAL_GetTick() - last_tick > 200U)   /* ï¿½ï¿½ï¿½ï¿½: 200 ms */
         {
             last_tick = HAL_GetTick();
-            HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_GPIO_PIN);      /* °´ÏÂ  ¡ú LED3 */
+            HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_GPIO_PIN);      /* ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ LED3 */
         }
         __HAL_GPIO_EXTI_CLEAR_IT(ENC_SW_GPIO_PIN);
     }
 }
+
+    void TIM4_IRQHandler(void)
+    {
+      HAL_TIM_IRQHandler(&htim4);
+    }
+
+    void TIM5_IRQHandler(void)
+    {
+      HAL_TIM_IRQHandler(&htim5);
+    }
 
 /* USER CODE END 1 */

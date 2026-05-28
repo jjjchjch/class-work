@@ -56,8 +56,10 @@ void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
 /* USER CODE BEGIN EFP */
-void EXTI9_5_IRQHandler(void);   /* EC11 CLK (PA7) ¡ª Ðý×ª¼ì²â£¬ÓÅÏÈ¼¶ 1 */
-void EXTI4_IRQHandler(void);     /* EC11 SW  (PC4) ¡ª °´¼ü¼ì²â£¬ÓÅÏÈ¼¶ 2 */
+void EXTI9_5_IRQHandler(void);   /* EC11 CLK (PA7) ï¿½ï¿½ ï¿½ï¿½×ªï¿½ï¿½â£¬ï¿½ï¿½ï¿½È¼ï¿½ 1 */
+void EXTI4_IRQHandler(void);     /* EC11 SW  (PC4) ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â£¬ï¿½ï¿½ï¿½È¼ï¿½ 2 */
+void TIM4_IRQHandler(void);
+void TIM5_IRQHandler(void);
 /* USER CODE END EFP */
 
 #ifdef __cplusplus

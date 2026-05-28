@@ -2,6 +2,7 @@
 #include "gpio.h"
 #include "uart.h"
 #include "key.h"
+#include "timer.h"
 
 static void SystemClock_Config(void);
 
@@ -10,10 +11,11 @@ int main(void)
   HAL_Init();
   SystemClock_Config();
   MX_GPIO_Init();
+  TIM3_PWM_Init();
   key_init();
   UART1_Init();
 
-  UART1_SendString("System ready. Press KEY1 / KEY2 / KEY3.\r\n");
+  UART1_SendString("PWM: PA6/PA7  1kHz  25%\r\nPress KEY1/KEY2/KEY3 to test.\r\n");
 
   while (1)
   {

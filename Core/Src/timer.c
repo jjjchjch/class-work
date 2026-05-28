@@ -3,17 +3,18 @@
 
 /**
  * @brief  TIM3 PWM 初始化
- *         PA6 → TIM3_CH1 (AF2)  1kHz, 占空比 25%
- *         PA7 → TIM3_CH2 (AF2)  1kHz, 占空比 25%
+ *         PA6 -> TIM3_CH1 (AF2)  1kHz, 占空比 25%
+ *         PA7 -> TIM3_CH2 (AF2)  1kHz, 占空比 50%
  *
  *         SYSCLK = 16MHz (HSI, 无PLL)
- *         PSC = 15   → 计数时钟 = 16MHz / 16 = 1MHz（1?s/tick）
- *         ARR = 999  → 溢出周期 = (999+1) × 1?s = 1ms（1kHz）
- *         CCR = 250  → 占空比 = 250 / 1000 = 25%
+ *         PSC = 15   -> 计数时钟 = 16MHz / 16 = 1MHz（1us/tick）
+ *         ARR = 999  -> 溢出周期 = (999+1) x 1us = 1ms（1kHz）
+ *         CCR1 = 250 -> 占空比 = 250 / 1000 = 25%  (PA6)
+ *         CCR2 = 500 -> 占空比 = 500 / 1000 = 50%  (PA7)
  */
 void TIM3_PWM_Init(void)
 {
-    /* ---- GPIO 配置：PA6 / PA7 → TIM3 复用推挽输出 ---- */
+    /* ---- GPIO: PA6 / PA7 -> TIM3 复用推挽输出 ---- */
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
     GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -40,21 +41,22 @@ void TIM3_PWM_Init(void)
         Error_Handler();
     }
 
-    /* ---- 通道输出配置（PWM Mode 1） ---- */
+    /* ---- CH1: PA6, 25% 占空比 ---- */
     TIM_OC_InitTypeDef sConfigOC = {0};
     sConfigOC.OCMode       = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse        = 250U;           /* CCR = 250 → 25% 占空比 */
+    sConfigOC.Pulse        = 250U;           /* CCR = 250 -> 25% */
     sConfigOC.OCPolarity   = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCFastMode   = TIM_OCFAST_DISABLE;
 
-    /* CH1 → PA6 */
     if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
     {
         Error_Handler();
     }
     HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 
-    /* CH2 → PA7 */
+    /* ---- CH2: PA7, 50% 占空比 ---- */
+    sConfigOC.Pulse = 500U;                  /* CCR = 500 -> 50% */
+
     if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
     {
         Error_Handler();

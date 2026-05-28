@@ -8,14 +8,15 @@ extern "C" {
 #include "stm32f4xx_hal.h"
 
 /**
- * TIM3 PWM 输出
- *   CH1 → PA6 (AF2)   示波器 CH1
- *   CH2 → PA7 (AF2)   示波器 CH2
+ * TIM3 PWM 输出（APB1，16位定时器）
+ *   CH1 → PA6 (AF2)   示波器 CH1  25% 占空比
+ *   CH2 → PA7 (AF2)   示波器 CH2  50% 占空比
  *
  * SYSCLK = 16MHz (HSI)
  *   PSC = 15  → 计数时钟 1MHz（1?s/tick）
  *   ARR = 999 → 周期 1ms（1kHz）
- *   CCR = 250 → 占空比 25%
+ *   CCR1 = 250 → PA6 占空比 25%
+ *   CCR2 = 500 → PA7 占空比 50%
  */
 void TIM3_PWM_Init(void);
 

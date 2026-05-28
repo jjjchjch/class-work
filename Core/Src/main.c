@@ -15,7 +15,7 @@ int main(void)
   key_init();
   UART1_Init();
 
-  UART1_SendString("PWM: PA6/PA7  1kHz  25%\r\nPress KEY1/KEY2/KEY3 to test.\r\n");
+  UART1_SendString("PWM: PA6(25%) PA7(50%)  1kHz\r\nPress KEY1/KEY2/KEY3 to test.\r\n");
 
   while (1)
   {

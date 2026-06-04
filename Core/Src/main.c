@@ -3,6 +3,7 @@
 #include "uart.h"
 #include "key.h"
 #include "timer.h"
+#include <stdio.h>
 
 static void SystemClock_Config(void);
 
@@ -11,11 +12,18 @@ int main(void)
   HAL_Init();
   SystemClock_Config();
   MX_GPIO_Init();
-  TIM3_PWM_Init();
+  TIM3_PWM_Init();        /* PA6: 50% PWM 输出        */
+  TIM3_IC_Init();         /* PA7: 输入捕获 PA6 的波形  */
+  TIM4_Breathe_Init();    /* PB1: 呼吸灯               */
   key_init();
   UART1_Init();
 
-  UART1_SendString("PWM: PA6(25%) PA7(50%)  1kHz\r\nPress KEY1/KEY2/KEY3 to test.\r\n");
+  UART1_SendString("=== STM32F407 PWM Capture Demo ===\r\n");
+  UART1_SendString("PA6 -> PWM OUT (50%%, 1kHz)\r\n");
+  UART1_SendString("PA7 -> IC IN  (connect PA6--PA7)\r\n");
+  UART1_SendString("Capture result prints every 500ms\r\n\r\n");
+
+  uint32_t last_print = 0;
 
   while (1)
   {
@@ -32,6 +40,29 @@ int main(void)
     else if (key == KEY3_PRES)
     {
       UART1_SendString("KEY3 pressed\r\n");
+    }
+
+    /* 每 500ms 打印一次捕获结果 */
+    if (HAL_GetTick() - last_print >= 500U)
+    {
+      last_print = HAL_GetTick();
+
+      if (g_ic_result.valid)
+      {
+        char buf[128];
+        snprintf(buf, sizeof(buf),
+                 "Freq: %lu Hz | Period: %lu us | High: %lu us | Duty: %lu.%lu%%\r\n",
+                 (unsigned long)g_ic_result.freq_hz,
+                 (unsigned long)g_ic_result.period_us,
+                 (unsigned long)g_ic_result.high_us,
+                 (unsigned long)(g_ic_result.duty / 10),
+                 (unsigned long)(g_ic_result.duty % 10));
+        UART1_SendString(buf);
+      }
+      else
+      {
+        UART1_SendString("Waiting for capture... (connect PA6 to PA7)\r\n");
+      }
     }
   }
 }

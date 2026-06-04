@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "encoder.h"
+#include "timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -253,4 +254,125 @@ void EXTI4_IRQHandler(void)
     }
 }
 
-/* USER CODE END 1 */
+/**
+ * @brief  TIM3 中断处理——输入捕获 (CH2: PA7)
+ *
+ *         状态机: 上升沿 → 下降沿 → 上升沿 → 计算并更新 g_ic_result
+ *         捕获 PA6 输出的 PWM 波形（需杜邦线连接 PA6—PA7）
+ *
+ *         同时处理 UPDATE 溢出中断，记录溢出次数以支持长周期测量
+ */
+void TIM3_IRQHandler(void)
+{
+    static uint32_t ovf_cnt     = 0;     /* 溢出次数计数器          */
+    static uint32_t cap_rising1 = 0;     /* 第一次上升沿 CCR        */
+    static uint32_t cap_falling = 0;     /* 下降沿 CCR              */
+    static uint32_t cap_rising2 = 0;     /* 第二次上升沿 CCR        */
+    static uint8_t  cap_state   = 0;     /* 0=等上升沿1, 1=等下降沿, 2=等上升沿2 */
+
+    /* ---- 溢出更新中断：累计溢出次数 ---- */
+    if (__HAL_TIM_GET_FLAG(&htim3, TIM_FLAG_UPDATE))
+    {
+        __HAL_TIM_CLEAR_FLAG(&htim3, TIM_FLAG_UPDATE);
+        ovf_cnt++;
+        return;
+    }
+
+    /* ---- CH2 捕获中断 ---- */
+    if (__HAL_TIM_GET_FLAG(&htim3, TIM_FLAG_CC2))
+    {
+        __HAL_TIM_CLEAR_FLAG(&htim3, TIM_FLAG_CC2);
+
+        uint32_t ccr = HAL_TIM_ReadCapturedValue(&htim3, TIM_CHANNEL_2);
+
+        switch (cap_state)
+        {
+        case 0: /* 第一次上升沿 */
+            cap_rising1 = ccr;
+            ovf_cnt     = 0;
+            cap_state   = 1;
+            /* 切换为下降沿捕获 */
+            __HAL_TIM_SET_CAPTUREPOLARITY(&htim3, TIM_CHANNEL_2, TIM_ICPOLARITY_FALLING);
+            break;
+
+        case 1: /* 下降沿 */
+            cap_falling = ovf_cnt * (htim3.Init.Period + 1U) + ccr;
+            cap_state   = 2;
+            /* 切换回上升沿捕获 */
+            __HAL_TIM_SET_CAPTUREPOLARITY(&htim3, TIM_CHANNEL_2, TIM_ICPOLARITY_RISING);
+            break;
+
+        case 2: /* 第二次上升沿 → 完成一次完整测量 */
+        {
+            cap_rising2 = ovf_cnt * (htim3.Init.Period + 1U) + ccr;
+
+            /* 计算周期和高电平时间（单位：us，因为计数时钟=1MHz） */
+            uint32_t period  = cap_rising2 - cap_rising1;   /* 周期 (us)   */
+            uint32_t high_us = cap_falling  - cap_rising1;   /* 高电平 (us) */
+
+            if (period > 0)
+            {
+                g_ic_result.period_us = period;
+                g_ic_result.high_us   = high_us;
+                g_ic_result.duty      = high_us * 1000U / period; /* 千分比 */
+                g_ic_result.freq_hz   = 1000000U / period;         /* Hz      */
+                g_ic_result.valid     = 1;
+            }
+
+            /* 重置状态，准备下一次测量 */
+            cap_state = 0;
+            ovf_cnt   = 0;
+            break;
+        }
+
+        default:
+            cap_state = 0;
+            ovf_cnt   = 0;
+            break;
+        }
+    }
+}
+
+/**
+ * @brief  TIM4 更新中断——软件PWM呼吸灯 (PB1 / LED2, 低电平点亮)
+ *
+ *         中断频率 20kHz；软件PWM 100步 → 200Hz
+ *         每 2 个PWM周期（10ms）更新一次占空比
+ *         0→99→0 共199步 × 10ms ≈ 2s 呼吸周期
+ */
+void TIM4_IRQHandler(void)
+{
+    if (TIM4->SR & TIM_SR_UIF)
+    {
+        TIM4->SR = ~TIM_SR_UIF;              /* 清除中断标志                    */
+
+        static uint8_t pwm_cnt    = 0U;      /* 软件PWM步数 0-99             */
+        static uint8_t duty       = 0U;      /* 当前占空比  0-99             */
+        static uint8_t breath_dir = 1U;      /* 1=增亮  0=变暗               */
+        static uint8_t cycle_cnt  = 0U;      /* PWM完整周期计数            */
+
+        /* PB1 (LED2) 低电平点亮 */
+        if (pwm_cnt < duty)
+            GPIOB->BSRR = (uint32_t)GPIO_PIN_1 << 16U;  /* 低电平: 亮 */
+        else
+            GPIOB->BSRR = GPIO_PIN_1;                    /* 高电平: 灯灯 */
+
+        if (++pwm_cnt >= 100U)
+        {
+            pwm_cnt = 0U;
+            if (++cycle_cnt >= 2U)           /* 每 2 个PWM周期 = 10ms */
+            {
+                cycle_cnt = 0U;
+                if (breath_dir)
+                {
+                    if (++duty >= 99U) breath_dir = 0U;
+                }
+                else
+                {
+                    if (duty == 0U) breath_dir = 1U;
+                    else            duty--;
+                }
+            }
+        }
+    }
+}

@@ -5,6 +5,12 @@
 TIM_HandleTypeDef htim3 = {0};
 volatile TIM3_IC_Result_t g_ic_result = {0};
 
+/* ---- 数字钟时间变量 ---- */
+volatile uint8_t g_clock_hour   = 12;
+volatile uint8_t g_clock_min    = 0;
+volatile uint8_t g_clock_sec    = 0;
+volatile uint8_t g_clock_update = 0;
+
 /**
  * @brief  TIM3 PWM 初始化
  *         PA6 -> TIM3_CH1 (AF2)  1kHz, 占空比 50%
@@ -126,4 +132,26 @@ void TIM4_Breathe_Init(void)
 
     HAL_NVIC_SetPriority(TIM4_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(TIM4_IRQn);
+}
+
+/**
+ * @brief  TIM2 数字钟定时器初始化（1秒中断）
+ *
+ *         SYSCLK = 16MHz (HSI)
+ *         PSC = 15999 → 计数时钟 = 16MHz / 16000 = 1kHz（1ms/tick）
+ *         ARR = 999   → 溢出周期 = (999+1) x 1ms = 1s
+ */
+void TIM2_Clock_Init(void)
+{
+    __HAL_RCC_TIM2_CLK_ENABLE();
+
+    TIM2->PSC  = 15999U;                      /* 16MHz / 16000 = 1kHz     */
+    TIM2->ARR  = 999U;                       /* 1kHz / 1000  = 1s        */
+    TIM2->EGR  = TIM_EGR_UG;                 /* 立即加载PSC/ARR          */
+    TIM2->SR   = 0U;                         /* 清除所有中断标志          */
+    TIM2->DIER = TIM_DIER_UIE;               /* 使能更新中断              */
+    TIM2->CR1  = TIM_CR1_ARPE | TIM_CR1_CEN; /* 自动重装载 + 启动计数器  */
+
+    HAL_NVIC_SetPriority(TIM2_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(TIM2_IRQn);
 }

@@ -58,8 +58,9 @@ void SysTick_Handler(void);
 /* USER CODE BEGIN EFP */
 void EXTI9_5_IRQHandler(void);   /* EC11 CLK (PA7) — 旋转检测，优先级 1 */
 void EXTI4_IRQHandler(void);     /* EC11 SW  (PC4) — 按键检测，优先级 2 */
-void TIM3_IRQHandler(void);      /* TIM3 输入捕获 (PA7 CH2)        */
-void TIM4_IRQHandler(void);      /* TIM4 软件PWM呼吸灯              */
+void TIM2_IRQHandler(void);      /* TIM2 数字钟 1s 定时              */
+void TIM3_IRQHandler(void);      /* TIM3 输入捕获 (PA7 CH2)          */
+void TIM4_IRQHandler(void);      /* TIM4 软件PWM呼吸灯                */
 /* USER CODE END EFP */
 
 #ifdef __cplusplus

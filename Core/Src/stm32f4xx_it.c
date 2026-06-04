@@ -203,6 +203,37 @@ void SysTick_Handler(void)
 /* USER CODE BEGIN 1 */
 
 /**
+ * @brief  TIM2 中断处理——数字钟 1 秒定时
+ *
+ *         每 1 秒触发一次，更新时分秒
+ *         设置 g_clock_update 标志通知主循环刷新 LCD
+ */
+void TIM2_IRQHandler(void)
+{
+    if (TIM2->SR & TIM_SR_UIF)
+    {
+        TIM2->SR = ~TIM_SR_UIF;              /* 清除中断标志 */
+
+        g_clock_sec++;
+        if (g_clock_sec >= 60)
+        {
+            g_clock_sec = 0;
+            g_clock_min++;
+            if (g_clock_min >= 60)
+            {
+                g_clock_min = 0;
+                g_clock_hour++;
+                if (g_clock_hour >= 24)
+                {
+                    g_clock_hour = 0;
+                }
+            }
+        }
+        g_clock_update = 1;                  /* 通知主循环刷新显示 */
+    }
+}
+
+/**
  * @brief  EXTI9_5 中断处理函数 — EC11 CLK(PA7) 下降沿
  *         NVIC: EXTI9_5_IRQn，抢占优先级 1（最高）
  *

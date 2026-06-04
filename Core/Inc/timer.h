@@ -50,6 +50,22 @@ void TIM3_IC_Init(void);
  */
 void TIM4_Breathe_Init(void);
 
+/**
+ * TIM2 数字钟定时器（APB1，32位定时器）
+ *   1秒中断，用于更新数字钟
+ *
+ * SYSCLK = 16MHz (HSI)
+ *   PSC = 15999 → 计数时钟 1kHz（1ms/tick）
+ *   ARR = 999   → 1s 溢出周期
+ */
+void TIM2_Clock_Init(void);
+
+/* 数字钟时间变量（TIM2 ISR 中更新） */
+extern volatile uint8_t g_clock_hour;
+extern volatile uint8_t g_clock_min;
+extern volatile uint8_t g_clock_sec;
+extern volatile uint8_t g_clock_update;   /* 1 = 需要刷新显示 */
+
 #ifdef __cplusplus
 }
 #endif

@@ -3,6 +3,7 @@
 #include "uart.h"
 #include "key.h"
 #include "timer.h"
+#include "bsp_LCD_ILI9341.h"
 #include <stdio.h>
 
 static void SystemClock_Config(void);
@@ -15,15 +16,31 @@ int main(void)
   TIM3_PWM_Init();        /* PA6: 50% PWM 输出        */
   TIM3_IC_Init();         /* PA7: 输入捕获 PA6 的波形  */
   TIM4_Breathe_Init();    /* PB1: 呼吸灯               */
+  TIM2_Clock_Init();      /* TIM2: 数字钟 1s 定时      */
   key_init();
   UART1_Init();
 
-  UART1_SendString("=== STM32F407 PWM Capture Demo ===\r\n");
+  UART1_SendString("=== STM32F407 PWM Capture + LCD Clock ===\r\n");
   UART1_SendString("PA6 -> PWM OUT (50%%, 1kHz)\r\n");
   UART1_SendString("PA7 -> IC IN  (connect PA6--PA7)\r\n");
-  UART1_SendString("Capture result prints every 500ms\r\n\r\n");
+  UART1_SendString("LCD: Digital Clock (HH:MM:SS)\r\n\r\n");
+
+  LCD_Init();
+  LCD_SetDir(0);                                         /* 竖屏显示         */
+  LCD_Fill(0, 0, 240, 320, BLACK);                       /* 黑色背景         */
+
+  /* 上半部标题区域 */
+  LCD_Fill(0, 0, 240, 159, DARKBLUE);                    /* 深蓝背景区分上下 */
+  LCD_String(20, 10, "Digital Clock", 16, WHITE, DARKBLUE);
+
+  /* 画一条分隔线 */
+  LCD_Line(0, 159, 240, 159, CYAN);
+
+  /* 下半部显示 PWM 捕获信息标题 */
+  LCD_String(20, 170, "PWM Capture", 16, YELLOW, BLACK);
 
   uint32_t last_print = 0;
+  static char lcd_buf[32];
 
   while (1)
   {
@@ -42,7 +59,21 @@ int main(void)
       UART1_SendString("KEY3 pressed\r\n");
     }
 
-    /* 每 500ms 打印一次捕获结果 */
+    /* ---- 数字钟 LCD 刷新（由 TIM2 ISR 触发）---- */
+    if (g_clock_update)
+    {
+      g_clock_update = 0;
+
+      /* 在 LCD 上半部居中显示 HH:MM:SS（字号 32） */
+      snprintf(lcd_buf, sizeof(lcd_buf), "%02d:%02d:%02d",
+               g_clock_hour, g_clock_min, g_clock_sec);
+
+      /* 32 号字体每个字符宽约 16 像素, "HH:MM:SS" 共 8 字符 ≈ 128 像素 */
+      /* 居中: X = (240 - 128) / 2 = 56, Y 在标题下方居中 */
+      LCD_String(56, 60, lcd_buf, 32, GREEN, DARKBLUE);
+    }
+
+    /* ---- 每 500ms 串口打印捕获结果 ---- */
     if (HAL_GetTick() - last_print >= 500U)
     {
       last_print = HAL_GetTick();
@@ -58,10 +89,6 @@ int main(void)
                  (unsigned long)(g_ic_result.duty / 10),
                  (unsigned long)(g_ic_result.duty % 10));
         UART1_SendString(buf);
-      }
-      else
-      {
-        UART1_SendString("Waiting for capture... (connect PA6 to PA7)\r\n");
       }
     }
   }

@@ -1,13 +1,13 @@
 /**
  ****************************************************************************************************
  * @file        adc.h
- * @brief       ADC 驱动代码 (软件触发)
+ * @brief       ADC 驱动代码 (TIM2 定时触发 + DMA)
  *
- *              芯片内部温度 → ADC1_IN16 (ADC_CHANNEL_TEMPSENSOR)
- *              光敏电阻分压  → PC1  (ADC1_IN11)
+ *              光敏电阻分压 → PC1 (ADC1_IN11)
+ *              TIM2 TRGO 每 100ms 触发一次 ADC 转换
+ *              DMA 循环传输转换结果
  *
  *              STM32F407VET6, SYSCLK = 16MHz (HSI)
- *              APB2 = 16MHz, ADC CLK = APB2/4 = 4MHz
  ****************************************************************************************************
  */
 
@@ -16,23 +16,19 @@
 
 #include "stm32f4xx_hal.h"
 
-/* ---- 芯片内部温度传感器 ---- */
-#define ADC_TEMP_ADC                ADC1
-#define ADC_TEMP_CHANNEL            ADC_CHANNEL_TEMPSENSOR   /* ADC1_IN16, 内部通道, 无需 GPIO */
-
 /* ---- 光敏电阻分压 (PC1) ---- */
 #define ADC_PHOTO_GPIO_PORT         GPIOC
 #define ADC_PHOTO_GPIO_PIN          GPIO_PIN_1
 #define ADC_PHOTO_GPIO_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
 #define ADC_PHOTO_ADC               ADC1
 #define ADC_PHOTO_CHANNEL           ADC_CHANNEL_11
-#define ADC_PHOTO_CLK_ENABLE()      __HAL_RCC_ADC1_CLK_ENABLE()
 
-void     adc_init(void);                                              /* ADC 初始化 */
-uint32_t adc_get_result(uint32_t ch);                                 /* 获取单通道转换值 */
-uint32_t adc_get_result_average(uint32_t ch, uint8_t times);          /* 获取通道多次平均转换值 */
-float    adc_get_voltage(uint32_t ch, uint8_t times);                 /* 获取通道电压值 (V) */
-uint32_t adc_get_voltage_mv(uint32_t ch, uint8_t times);              /* 获取通道电压值 (mV, 整数) */
-float    adc_get_temperature(uint8_t times);                          /* 获取芯片内部温度 (°C) */
+/* ---- DMA 缓冲区 ---- */
+extern volatile uint16_t g_adc_dma_buf;      /* DMA 循环缓冲区 (1个元素) */
+extern volatile uint8_t  g_adc_new_data;     /* 新数据标志: 1=有新数据 */
+
+void     adc_init(void);                     /* ADC 初始化 (定时触发+DMA) */
+void     adc_start_dma(void);                /* 启动 ADC DMA 传输 */
+float    adc_get_voltage_v(uint16_t adc_val);  /* ADC 值 → 电压 (V) */
 
 #endif /* __ADC_H */

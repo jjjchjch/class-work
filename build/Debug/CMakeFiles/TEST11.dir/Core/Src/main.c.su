@@ -1,3 +1,5 @@
-D:/CUBEproject/TEST11_new/Core/Src/main.c:22:5:main	32	static
-D:/CUBEproject/TEST11_new/Core/Src/main.c:96:13:SystemClock_Config	88	static
-D:/CUBEproject/TEST11_new/Core/Src/main.c:126:6:Error_Handler	4	static
+D:/CUBEproject/TEST11_new/Core/Src/main.c:42:13:Wave_DrawAxis	32	static
+D:/CUBEproject/TEST11_new/Core/Src/main.c:79:13:Wave_Update	56	static
+D:/CUBEproject/TEST11_new/Core/Src/main.c:123:5:main	32	static
+D:/CUBEproject/TEST11_new/Core/Src/main.c:203:13:SystemClock_Config	88	static
+D:/CUBEproject/TEST11_new/Core/Src/main.c:233:6:Error_Handler	4	static

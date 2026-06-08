@@ -51,20 +51,16 @@ void TIM3_IC_Init(void);
 void TIM4_Breathe_Init(void);
 
 /**
- * TIM2 数字钟定时器（APB1，32位定时器）
- *   1秒中断，用于更新数字钟
+ * TIM2 定时触发初始化 (100ms TRGO, 用于触发 ADC)
  *
  * SYSCLK = 16MHz (HSI)
- *   PSC = 15999 → 计数时钟 1kHz（1ms/tick）
- *   ARR = 999   → 1s 溢出周期
+ *   PSC = 15999 → 计数时钟 1kHz (1ms/tick)
+ *   ARR = 99    → 溢出周期 100ms
+ *   MMS = 010   → 更新事件作为 TRGO 输出
+ *
+ * ADC 配置为 TIM2 TRGO 触发, 每 100ms 自动转换一次
  */
-void TIM2_Clock_Init(void);
-
-/* 数字钟时间变量（TIM2 ISR 中更新） */
-extern volatile uint8_t g_clock_hour;
-extern volatile uint8_t g_clock_min;
-extern volatile uint8_t g_clock_sec;
-extern volatile uint8_t g_clock_update;   /* 1 = 需要刷新显示 */
+void TIM2_TRGO_Init(void);
 
 #ifdef __cplusplus
 }

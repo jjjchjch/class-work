@@ -155,3 +155,30 @@ void TIM2_Clock_Init(void)
     HAL_NVIC_SetPriority(TIM2_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(TIM2_IRQn);
 }
+
+/**
+ * @brief  TIM2 定时触发初始化 (100ms TRGO, 用于触发 ADC)
+ *
+ *         SYSCLK = 16MHz (HSI)
+ *         PSC = 15999 → 计数时钟 1kHz (1ms/tick)
+ *         ARR = 99    → 溢出周期 100ms
+ *         MMS = 010   → 更新事件作为 TRGO 输出
+ *
+ *         TRGO 连接到 ADC1 外部触发, 每 100ms 自动触发一次 ADC 转换
+ */
+void TIM2_TRGO_Init(void)
+{
+    __HAL_RCC_TIM2_CLK_ENABLE();
+
+    TIM2->PSC  = 15999U;                         /* 16MHz / 16000 = 1kHz        */
+    TIM2->ARR  = 99U;                            /* 1kHz / 100 = 10Hz (100ms)   */
+    TIM2->EGR  = TIM_EGR_UG;                    /* 立即加载 PSC/ARR            */
+
+    /* MMS[2:0] = 010: 更新事件作为 TRGO 输出 */
+    TIM2->CR2  &= ~TIM_CR2_MMS;
+    TIM2->CR2  |= TIM_TRGO_UPDATE;
+
+    TIM2->SR    = 0U;                            /* 清除所有中断标志             */
+    TIM2->DIER  = 0U;                            /* 不使能中断 (仅 TRGO 输出)    */
+    TIM2->CR1   = TIM_CR1_ARPE | TIM_CR1_CEN;   /* 自动重装载 + 启动计数器     */
+}

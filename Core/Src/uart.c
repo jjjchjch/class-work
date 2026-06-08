@@ -2,6 +2,7 @@
 
 #include "main.h"
 #include <string.h>
+#include <stdio.h>
 
 static UART_HandleTypeDef huart1;
 
@@ -56,4 +57,20 @@ bool UART1_ReceiveByte(uint8_t *byte)
   }
 
   return (HAL_UART_Receive(&huart1, byte, 1U, 0U) == HAL_OK);
+}
+
+/**
+ * @brief  发送 ADC 值供串口示波器显示波形
+ *         格式: "XXXX\r\n" (ADC 值 + 回车换行)
+ *         兼容 VOFA+ (Justfire 协议)、SerialPlot、Arduino 串口绘图器等
+ * @param  adc_val: 12位 ADC 值 (0~4095)
+ */
+void UART1_SendADC(uint16_t adc_val)
+{
+    char buf[16];
+    int len = snprintf(buf, sizeof(buf), "%d\r\n", adc_val);
+    if (len > 0)
+    {
+        HAL_UART_Transmit(&huart1, (uint8_t *)buf, (uint16_t)len, 10U);
+    }
 }

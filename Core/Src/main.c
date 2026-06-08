@@ -1,222 +1,96 @@
+/**
+ ****************************************************************************************************
+ * @file        main.c
+ * @brief       ADC 软件触发实验 (参考: 实验7 ADC实验)
+ *
+ *              芯片内部温度 → ADC1_IN16 (内部温度传感器)
+ *              光敏电阻分压  → PC1       (ADC1_IN11)
+ *              LCD           → ILI9341   (FSMC 接口)
+ *
+ *              STM32F407VET6, SYSCLK = 16MHz (HSI)
+ ****************************************************************************************************
+ */
+
 #include "main.h"
 #include "gpio.h"
-#include "uart.h"
-#include "key.h"
-#include "timer.h"
+#include "adc.h"
 #include "bsp_LCD_ILI9341.h"
 #include <stdio.h>
-#include <math.h>
 
 static void SystemClock_Config(void);
 
-/* ---- 波形绘制参数 ---- */
-#define WF_LEFT      45      /* 坐标系左边界 X       */
-#define WF_RIGHT     225     /* 坐标系右边界 X       */
-#define WF_TOP       185     /* 坐标系上边界 Y       */
-#define WF_BOTTOM    295     /* 坐标系下边界 Y       */
-#define WF_CYCLES    3       /* 锯齿波周期数          */
-#define WF_VMAX      3.3f    /* 幅度最大值 (V)       */
-#define WF_TMAX      30.0f   /* 时间轴最大值 (ms)    */
-
-
-
-/**
- * @brief  绘制直角坐标系（带刻度线和标签）
- */
-static void Draw_Coordinate(void)
-{
-    uint8_t i;
-    int16_t x, y;
-    char lbl[8];
-
-    /* ---- 坐标轴外框 ---- */
-    LCD_Line(WF_LEFT,  WF_TOP,    WF_RIGHT, WF_TOP,    WHITE);   /* 上边框  */
-    LCD_Line(WF_LEFT,  WF_BOTTOM, WF_RIGHT, WF_BOTTOM, WHITE);   /* 下边框  */
-    LCD_Line(WF_LEFT,  WF_TOP,    WF_LEFT,  WF_BOTTOM, WHITE);   /* 左边框  */
-    LCD_Line(WF_RIGHT, WF_TOP,    WF_RIGHT, WF_BOTTOM, WHITE);   /* 右边框  */
-
-    /* ---- Y 轴刻度（幅度: 0 ~ 3.3V, 每格 0.5V）---- */
-    for (i = 0; i <= 7; i++)
-    {
-        y = WF_BOTTOM - (int16_t)((float)i * (WF_BOTTOM - WF_TOP) / 6.6f);
-        if (y < WF_TOP || y > WF_BOTTOM) continue;
-
-        /* 刻度短线 */
-        LCD_Line(WF_LEFT - 5, y, WF_LEFT, y, WHITE);
-
-        /* 水平虚线（网格） */
-        for (x = WF_LEFT + 1; x < WF_RIGHT; x += 4)
-            LCD_DrawPoint(x, y, GRAY);
-
-        /* 标签 */
-        if (i % 2 == 0)
-        {
-            snprintf(lbl, sizeof(lbl), "%.1f", (float)i * 0.5f);
-            LCD_String(2, y - 6, lbl, 12, YELLOW, BLACK);
-        }
-    }
-
-    /* ---- X 轴刻度（时间: 0 ~ 30ms, 每格 5ms）---- */
-    for (i = 0; i <= 6; i++)
-    {
-        x = WF_LEFT + (int16_t)((float)i * (WF_RIGHT - WF_LEFT) / 6.0f);
-        if (x < WF_LEFT || x > WF_RIGHT) continue;
-
-        /* 刻度短线 */
-        LCD_Line(x, WF_BOTTOM, x, WF_BOTTOM + 5, WHITE);
-
-        /* 垂直虚线（网格） */
-        for (y = WF_TOP + 1; y < WF_BOTTOM; y += 4)
-            LCD_DrawPoint(x, y, GRAY);
-
-        /* 标签 */
-        snprintf(lbl, sizeof(lbl), "%d", i * 5);
-        LCD_String(x - 8, WF_BOTTOM + 8, lbl, 12, YELLOW, BLACK);
-    }
-
-    /* ---- 轴标签 ---- */
-    LCD_String(WF_RIGHT - 30, WF_TOP - 14, "V", 16, WHITE, BLACK);        /* Y 轴单位 */
-    LCD_String(WF_RIGHT - 40, WF_BOTTOM + 8, "ms", 12, YELLOW, BLACK);    /* X 轴单位 */
-    LCD_String(WF_LEFT + 60, WF_TOP - 14, "Sawtooth Wave", 16, CYAN, BLACK);
-}
-
-/**
- * @brief  绘制锯齿波波形（3 周期）
- *
- *         锯齿波公式: y(t) = Vmax * (t % T) / T
- *         周期 T = Tmax / Cycles
- *         逐像素绘制，保证连续
- */
-static void Draw_Sawtooth(void)
-{
-    int16_t px, py;
-    int16_t prev_px = 0, prev_py = 0;
-    uint8_t first = 1;
-    float period = WF_TMAX / (float)WF_CYCLES;      /* 单个周期时间 */
-    float t, v;
-    int16_t x_range = WF_RIGHT - WF_LEFT;
-    int16_t y_range = WF_BOTTOM - WF_TOP;
-
-    /* 逐列扫描，计算每个 X 像素对应的波形值 */
-    for (px = WF_LEFT; px <= WF_RIGHT; px++)
-    {
-        /* 像素 X → 时间 t (ms) */
-        t = (float)(px - WF_LEFT) * WF_TMAX / (float)x_range;
-
-        /* 锯齿波: 取余周期内线性上升 */
-        v = WF_VMAX * fmodf(t, period) / period;
-
-        /* 幅度 v → 像素 Y (上小下大) */
-        py = WF_BOTTOM - (int16_t)(v * (float)y_range / WF_VMAX);
-
-        /* 边界裁剪 */
-        if (py < WF_TOP)  py = WF_TOP;
-        if (py > WF_BOTTOM) py = WF_BOTTOM;
-
-        if (first)
-        {
-            prev_px = px;
-            prev_py = py;
-            first = 0;
-        }
-        else
-        {
-            /* 画线段连接相邻像素，保证锯齿波回落在相邻列完成 */
-            LCD_Line(prev_px, prev_py, px, py, GREEN);
-            prev_px = px;
-            prev_py = py;
-        }
-    }
-}
-
 int main(void)
 {
-  HAL_Init();
-  SystemClock_Config();
-  MX_GPIO_Init();
-  TIM3_PWM_Init();        /* PA6: 50% PWM 输出        */
-  TIM3_IC_Init();         /* PA7: 输入捕获 PA6 的波形  */
-  TIM4_Breathe_Init();    /* PB1: 呼吸灯               */
-  TIM2_Clock_Init();      /* TIM2: 数字钟 1s 定时      */
-  key_init();
-  UART1_Init();
+    uint16_t adcx;
+    float    temp;
+    static char strTemp[30];
 
-  UART1_SendString("=== STM32F407 PWM Capture + LCD Clock ===\r\n");
-  UART1_SendString("PA6 -> PWM OUT (50%%, 1kHz)\r\n");
-  UART1_SendString("PA7 -> IC IN  (connect PA6--PA7)\r\n");
-  UART1_SendString("LCD: Digital Clock (HH:MM:SS)\r\n\r\n");
+    HAL_Init();
+    SystemClock_Config();
+    MX_GPIO_Init();
 
-  LCD_Init();
-  LCD_SetDir(0);                                         /* 竖屏显示         */
-  LCD_Fill(0, 0, 240, 320, BLACK);                       /* 黑色背景         */
+    /* ---- LCD 初始化 ---- */
+    LCD_Init();
+    LCD_SetDir(0);
+    LCD_Fill(0, 0, 240, 320, BLACK);
 
-  /* 上半部标题区域 */
-  LCD_Fill(0, 0, 240, 159, DARKBLUE);                    /* 深蓝背景区分上下 */
-  LCD_String(20, 10, "Digital Clock", 16, WHITE, DARKBLUE);
+    /* ---- 标题 ---- */
+    LCD_Fill(0, 0, 240, 40, DARKBLUE);
+    LCD_String(40, 8, "ADC Experiment", 16, WHITE, DARKBLUE);
+    LCD_Line(0, 40, 240, 40, CYAN);
 
-  /* 时钟下方显示名字 */
-  LCD_String(55, 115, "jinchenghao", 24, YELLOW, DARKBLUE);
+    /* ---- 芯片内部温度 ADC1_IN16 ---- */
+    LCD_String(5,  48,  "Chip Temp IN16", 24, BLACK, GREEN);
+    LCD_String(5,  78,  "ADC:", 24, CYAN, BLACK);
+    LCD_String(5,  108, "V  :", 24, CYAN, BLACK);
+    LCD_String(5,  138, "T  :", 24, CYAN, BLACK);
 
-  /* 画一条分隔线 */
-  LCD_Line(0, 159, 240, 159, CYAN);
+    /* ---- 分隔线 ---- */
+    LCD_Line(5, 170, 235, 170, GRAY);
 
-  /* ---- 下半部：直角坐标 + 锯齿波波形 ---- */
-  Draw_Coordinate();
-  Draw_Sawtooth();
+    /* ---- 光敏电阻 PC1 ---- */
+    LCD_String(5,  178, "Photoresist  PC1", 24, BLACK, GREEN);
+    LCD_String(5,  208, "ADC:", 24, CYAN, BLACK);
+    LCD_String(5,  238, "V  :", 24, CYAN, BLACK);
 
-  uint32_t last_print = 0;
-  static char lcd_buf[32];
+    /* ---- 底部 ---- */
+    LCD_Line(0, 288, 240, 288, CYAN);
+    LCD_String(60, 295, "jinchenghao", 24, YELLOW, BLACK);
 
-  while (1)
-  {
-    uint8_t key = key_scan(0);
+    /* ---- ADC 初始化 ---- */
+    adc_init();
 
-    if (key == KEY1_PRES)
+    while (1)
     {
-      UART1_SendString("KEY1 pressed\r\n");
-    }
-    else if (key == KEY2_PRES)
-    {
-      UART1_SendString("KEY2 pressed\r\n");
-    }
-    else if (key == KEY3_PRES)
-    {
-      UART1_SendString("KEY3 pressed\r\n");
-    }
+        /* ======== 芯片内部温度 ADC1_IN16 ======== */
+        adcx = (uint16_t)adc_get_result_average(ADC_TEMP_CHANNEL, 10);
+        temp = (float)adcx * (3.3f / 4096.0f);
 
-    /* ---- 数字钟 LCD 刷新（由 TIM2 ISR 触发）---- */
-    if (g_clock_update)
-    {
-      g_clock_update = 0;
+        sprintf(strTemp, "%4d    ", adcx);
+        LCD_String(80, 78, strTemp, 24, GREEN, BLACK);
 
-      /* 在 LCD 上半部居中显示 HH:MM:SS（字号 32） */
-      snprintf(lcd_buf, sizeof(lcd_buf), "%02d:%02d:%02d",
-               g_clock_hour, g_clock_min, g_clock_sec);
+        sprintf(strTemp, "%1.2f V    ", (double)temp);
+        LCD_String(80, 108, strTemp, 24, GREEN, BLACK);
 
-      /* 32 号字体每个字符宽约 16 像素, "HH:MM:SS" 共 8 字符 ≈ 128 像素 */
-      /* 居中: X = (240 - 128) / 2 = 56, Y 在标题下方居中 */
-      LCD_String(56, 60, lcd_buf, 32, GREEN, DARKBLUE);
+        /* 温度转换: T = (V25 - V_sense) / 0.0025 + 25 */
+        {
+            float temp_c = adc_get_temperature(10);
+            sprintf(strTemp, "%2.1f C    ", (double)temp_c);
+            LCD_String(80, 138, strTemp, 24, GREEN, BLACK);
+        }
+
+        /* ======== 光敏电阻 PC1 ======== */
+        adcx = (uint16_t)adc_get_result_average(ADC_PHOTO_CHANNEL, 10);
+        temp = (float)adcx * (3.3f / 4096.0f);
+
+        sprintf(strTemp, "%4d    ", adcx);
+        LCD_String(80, 208, strTemp, 24, GREEN, BLACK);
+
+        sprintf(strTemp, "%1.2f V    ", (double)temp);
+        LCD_String(80, 238, strTemp, 24, GREEN, BLACK);
+
+        HAL_Delay(200);
     }
-
-    /* ---- 每 500ms 串口打印捕获结果 ---- */
-    if (HAL_GetTick() - last_print >= 500U)
-    {
-      last_print = HAL_GetTick();
-
-      if (g_ic_result.valid)
-      {
-        char buf[128];
-        snprintf(buf, sizeof(buf),
-                 "Freq: %lu Hz | Period: %lu us | High: %lu us | Duty: %lu.%lu%%\r\n",
-                 (unsigned long)g_ic_result.freq_hz,
-                 (unsigned long)g_ic_result.period_us,
-                 (unsigned long)g_ic_result.high_us,
-                 (unsigned long)(g_ic_result.duty / 10),
-                 (unsigned long)(g_ic_result.duty % 10));
-        UART1_SendString(buf);
-      }
-    }
-  }
 }
 
 static void SystemClock_Config(void)

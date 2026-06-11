@@ -1,11 +1,10 @@
 /**
  ****************************************************************************************************
  * @file        adc.c
- * @brief       ADC 驱动代码 (TIM2 定时触发 + DMA)
+ * @brief       ADC 驱动 (单次转换 + 轮询, 最简可靠方案)
  *
  *              光敏电阻分压 → PC1 (ADC1_IN11)
- *              TIM2 TRGO 每 100ms 触发一次 ADC 转换
- *              DMA2_Stream0_Channel0 循环传输结果到 g_adc_dma_buf
+ *              adc_read() 启动软件触发转换 → 等待 EOC → 返回结果
  *
  *              STM32F407VET6, SYSCLK = 16MHz (HSI)
  *              APB2 = 16MHz, ADC CLK = APB2/4 = 4MHz
@@ -14,125 +13,104 @@
 
 #include "adc.h"
 
-/* ---- DMA 缓冲区 (DMA 循环写入) ---- */
-volatile uint16_t g_adc_dma_buf  = 0;
-volatile uint8_t  g_adc_new_data = 0;
-
-static ADC_HandleTypeDef  ADC_Handler;    /* ADC1 句柄 */
-static DMA_HandleTypeDef  DMA_Handler;    /* DMA2 句柄 */
+static ADC_HandleTypeDef ADC_Handler;    /* ADC1 句柄 */
 
 /**
- * @brief       ADC 初始化 (TIM2 TRGO 触发 + DMA 循环)
+ * @brief       ADC 初始化 (单通道, 软件触发)
+ *
+ *              配置 PC1 为模拟输入, ADC1_CH11
+ *              软件触发, 单次转换, 无 DMA, 无中断
+ *
  * @param       无
  * @retval      无
  */
 void adc_init(void)
 {
+    /* ---- GPIO: PC1 模拟输入 ---- */
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin  = GPIO_PIN_1;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
     /* ---- ADC1 基本配置 ---- */
+    __HAL_RCC_ADC1_CLK_ENABLE();
+
     ADC_Handler.Instance                   = ADC1;
-    ADC_Handler.Init.ClockPrescaler        = ADC_CLOCKPRESCALER_PCLK_DIV4;   /* ADCCLK = 16/4 = 4MHz */
-    ADC_Handler.Init.Resolution            = ADC_RESOLUTION_12B;             /* 12位精度 */
-    ADC_Handler.Init.DataAlign             = ADC_DATAALIGN_RIGHT;            /* 右对齐 */
-    ADC_Handler.Init.ScanConvMode          = DISABLE;                        /* 非扫描模式 */
-    ADC_Handler.Init.ContinuousConvMode    = DISABLE;                        /* 单次转换 (由TIM触发) */
-    ADC_Handler.Init.NbrOfConversion       = 1;                              /* 规则序列长度 = 1 */
+    ADC_Handler.Init.ClockPrescaler        = ADC_CLOCKPRESCALER_PCLK_DIV4;   /* ADCCLK = 4MHz */
+    ADC_Handler.Init.Resolution            = ADC_RESOLUTION_12B;
+    ADC_Handler.Init.DataAlign             = ADC_DATAALIGN_RIGHT;
+    ADC_Handler.Init.ScanConvMode          = DISABLE;
+    ADC_Handler.Init.ContinuousConvMode    = DISABLE;                        /* 单次转换 */
+    ADC_Handler.Init.NbrOfConversion       = 1;
     ADC_Handler.Init.DiscontinuousConvMode = DISABLE;
     ADC_Handler.Init.NbrOfDiscConversion   = 0;
-    ADC_Handler.Init.ExternalTrigConv      = ADC_EXTERNALTRIGCONV_T2_TRGO;   /* TIM2 TRGO 触发 */
-    ADC_Handler.Init.ExternalTrigConvEdge  = ADC_EXTERNALTRIGCONVEDGE_RISING; /* 上升沿触发 */
-    ADC_Handler.Init.DMAContinuousRequests = ENABLE;                         /* DMA 循环模式 */
+    ADC_Handler.Init.ExternalTrigConv      = ADC_SOFTWARE_START;             /* 软件触发 */
+    ADC_Handler.Init.ExternalTrigConvEdge  = ADC_EXTERNALTRIGCONVEDGE_NONE;
 
     HAL_ADC_Init(&ADC_Handler);
 
     /* ---- 配置通道 ---- */
     ADC_ChannelConfTypeDef sConfig = {0};
-    sConfig.Channel      = ADC_PHOTO_CHANNEL;
+    sConfig.Channel      = ADC_PHOTO_CHANNEL;         /* ADC_CHANNEL_11 */
     sConfig.Rank         = 1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
+    sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;  /* 长采样时间, 高阻抗信号稳定 */
 
     HAL_ADC_ConfigChannel(&ADC_Handler, &sConfig);
+
+    /* ==== 显式寄存器写入, 确保万无一失 ==== */
+
+    /* 规则序列长度 = 1 (SQR1[23:20] = 0) */
+    ADC1->SQR1 = 0;
+
+    /* 规则序列第1个转换 = CH11 (SQR3[4:0] = 11) */
+    ADC1->SQR3 = 11;
+
+    /* 采样时间 CH11 = 480 周期 (SMPR1[15:12] = 0b111 = 480 cycles) */
+    ADC1->SMPR1 |= (0x7U << 12);   /* 480 cycles for channel 11 */
 }
 
 /**
- * @brief       ADC 底层硬件初始化 (MSP)
- *              由 HAL_ADC_Init() 自动调用
- * @param       hadc: ADC 句柄指针
- * @retval      无
- */
-void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
-{
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    if (hadc->Instance == ADC1)
-    {
-        /* ---- 使能时钟 ---- */
-        __HAL_RCC_ADC1_CLK_ENABLE();
-        __HAL_RCC_GPIOC_CLK_ENABLE();
-        __HAL_RCC_DMA2_CLK_ENABLE();
-
-        /* ---- PC1: 模拟输入 (光敏电阻分压) ---- */
-        GPIO_InitStruct.Pin  = GPIO_PIN_1;
-        GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-        /* ---- DMA2_Stream0_Channel0: ADC1 数据流 ---- */
-        DMA_Handler.Instance                 = DMA2_Stream0;
-        DMA_Handler.Init.Channel             = DMA_CHANNEL_0;
-        DMA_Handler.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-        DMA_Handler.Init.PeriphInc           = DMA_PINC_DISABLE;
-        DMA_Handler.Init.MemInc              = DMA_MINC_DISABLE;       /* 单缓冲, 不递增 */
-        DMA_Handler.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-        DMA_Handler.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
-        DMA_Handler.Init.Mode                = DMA_CIRCULAR;           /* 循环模式 */
-        DMA_Handler.Init.Priority            = DMA_PRIORITY_HIGH;
-
-        HAL_DMA_Init(&DMA_Handler);
-
-        /* 关联 DMA 到 ADC */
-        __HAL_LINKDMA(hadc, DMA_Handle, DMA_Handler);
-
-        /* DMA 传输完成中断 */
-        HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 1, 0);
-        HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
-    }
-}
-
-/**
- * @brief       启动 ADC DMA 传输 (循环模式)
+ * @brief       单次 ADC 转换 (直接寄存器操作, 绕过 HAL)
+ *
+ *              软件触发 → 等待 EOC → 读 DR → 返回
+ *
  * @param       无
- * @retval      无
+ * @retval      12位 ADC 值 (0~4095)
  */
-void adc_start_dma(void)
+uint16_t adc_read(void)
 {
-    HAL_ADC_Start_DMA(&ADC_Handler, (uint32_t *)&g_adc_dma_buf, 1);
+    /* 确保 ADC 已使能, 若未使能则使能并等待稳定 */
+    if (!(ADC1->CR2 & ADC_CR2_ADON))
+    {
+        ADC1->CR2 |= ADC_CR2_ADON;
+        /* 等待 ADC 稳定 (tSTAB ≈ 几微秒, 这里等几个 APB2 周期) */
+        for (volatile uint32_t i = 0; i < 100; i++);
+    }
+
+    /* 清除 EOC 标志 (写 0 清除, 或读 DR 清除 — 保险起见先读一次) */
+    (void)ADC1->DR;
+
+    /* 软件触发启动转换 */
+    ADC1->CR2 |= ADC_CR2_SWSTART;
+
+    /* 等待转换完成 */
+    uint32_t timeout = 1000000;
+    while (!(ADC1->SR & ADC_SR_EOC))
+    {
+        if (--timeout == 0) return 0;
+    }
+
+    /* 读取结果 (读 DR 自动清除 EOC) */
+    return (uint16_t)(ADC1->DR & 0x0FFF);
 }
 
 /**
- * @brief       ADC 值转换为电压 (V)
- * @param       adc_val: 12位 ADC 值 (0~4095)
- * @retval      电压值 (V)
+ * @brief       ADC 值 → 电压 (V)
  */
 float adc_get_voltage_v(uint16_t adc_val)
 {
     return (float)adc_val * (3.3f / 4096.0f);
-}
-
-/* ================================================================
- * DMA 传输完成中断回调
- * ================================================================ */
-void DMA2_Stream0_IRQHandler(void)
-{
-    HAL_DMA_IRQHandler(&DMA_Handler);
-}
-
-/**
- * @brief       ADC 转换完成回调 (DMA 传输完成后 HAL 自动调用)
- * @param       hadc: ADC 句柄
- * @retval      无
- */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
-{
-    (void)hadc;
-    g_adc_new_data = 1;   /* 通知主循环有新数据 */
 }

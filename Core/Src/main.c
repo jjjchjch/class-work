@@ -17,6 +17,7 @@
 #include "timer.h"
 #include "adc.h"
 #include "uart.h"
+#include "dac.h"
 #include "bsp_LCD_ILI9341.h"
 #include "bsp_W25Q128.h"
 #include <stdio.h>
@@ -172,6 +173,9 @@ int main(void)
 
     /* ---- 启动 TIM2 (100ms TRGO) ---- */
     TIM2_TRGO_Init();
+
+    /* ---- 启动 DAC 锯齿波输出 (PA4, TIM5 1ms 触发 + DMA) ---- */
+    DAC_Sawtooth_Init();
 
     /* ---- 初始化 W25Q128 (中文字库) ---- */
     W25Q128_Init();

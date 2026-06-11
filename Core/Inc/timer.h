@@ -62,6 +62,19 @@ void TIM4_Breathe_Init(void);
  */
 void TIM2_TRGO_Init(void);
 
+/**
+ * TIM3 PWM 波形输出 (PA6)
+ *
+ * 将 ADC 采样值通过 PWM 占空比输出到 PA6
+ * 外接 RC 低通滤波即可得到模拟电压波形 (PWM DAC)
+ *
+ *   PSC = 15  → 计数时钟 1MHz
+ *   ARR = 999 → 周期 1ms (1kHz)
+ *   CCR1 = adc_val * 999 / 4096
+ */
+void TIM3_WaveOut_Init(void);
+void TIM3_WaveOut_Set(uint16_t adc_val);
+
 #ifdef __cplusplus
 }
 #endif

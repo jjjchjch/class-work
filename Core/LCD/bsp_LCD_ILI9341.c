@@ -1,6 +1,7 @@
 #include "bsp_LCD_ILI9341.h"
 #include "stdlib.h"
 #include "FONT.H"
+#include "bsp_W25Q128.h"
 
 /*****************************************************************************
  ** 全局有效    声明、定义
@@ -466,9 +467,45 @@ static void drawAscii(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint32_
 }
 
 /******************************************************************************
+ * 函  数： drawGBK
+ * 功  能： 显示一个汉字 (从 W25Q128 外部字库读取字模)
+ ******************************************************************************/
+static void drawGBK(uint16_t x, uint16_t y, uint8_t *font, uint8_t size, uint32_t bColor, uint32_t fColor)
+{
+    uint8_t temp;
+    uint16_t y0;
+    uint8_t GBKData[128];
+    uint8_t csize;
+
+    csize = (size / 8 + ((size % 8) ? 1 : 0)) * (size);
+    W25Q128_ReadFontData(font, size, GBKData);
+
+    y0 = y;
+    for (uint8_t t = 0; t < csize; t++)
+    {
+        temp = GBKData[t];
+        for (uint8_t t1 = 0; t1 < 8; t1++)
+        {
+            if (temp & 0x80) LCD_DrawPoint(x, y, fColor);
+            else             LCD_DrawPoint(x, y, bColor);
+            temp <<= 1;
+            y++;
+            if (y >= xLCD.height) return;
+            if ((y - y0) == size)
+            {
+                y = y0;
+                x++;
+                if (x >= xLCD.width) return;
+                break;
+            }
+        }
+    }
+}
+
+/******************************************************************************
  * 函  数： LCD_String
- * 功  能： 在LCD上显示字符串（仅支持ASCII英文，不含汉字）
- * 说  明： 移除 W25Q128 外部字库依赖
+ * 功  能： 在LCD上显示字符串 (支持 ASCII + 中文)
+ * 说  明： ASCII 使用内部字库, 中文通过 W25Q128 外部字库显示
  ******************************************************************************/
 void LCD_String(uint16_t x, uint16_t y, char *pFont, uint8_t size, uint32_t fColor, uint32_t bColor)
 {
@@ -495,8 +532,9 @@ void LCD_String(uint16_t x, uint16_t y, char *pFont, uint8_t size, uint32_t fCol
             pFont++;
             x += size / 2;
         }
-        else                // 非ASCII字符（汉字等），跳过（无外部字库）
+        else                // 汉字 (GBK编码, 从 W25Q128 读取字模)
         {
+            drawGBK(x, y, (uint8_t *)pFont, size, bColor, fColor);
             pFont += 2;
             x += size;
         }

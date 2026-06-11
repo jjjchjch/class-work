@@ -18,12 +18,20 @@
 #include "adc.h"
 #include "uart.h"
 #include "bsp_LCD_ILI9341.h"
+#include "bsp_W25Q128.h"
 #include <stdio.h>
 #include <string.h>
 
 static void SystemClock_Config(void);
 
-/* ==================== 波形绘制参数 ==================== */
+/* ==================== GBK 编码中文字符串 ====================
+ * W25Q128 字库使用 GBK 编码, 源文件为 UTF-8 时需用字节数组
+ * 否则 LCD 显示乱码
+ * ========================================================== */
+static const char STR_TITLE[]      = {0x41,0x44,0x43,0xB2,0xA8,0xD0,0xCE,0xCA,0xB5,0xD1,0xE9,0x00};  /* "ADC波形实验" */
+static const char STR_PHOTO[]      = {0xB9,0xE2,0xC3,0xF4,0xB5,0xE7,0xD7,0xE8,0x20,0x50,0x43,0x31,0x00}; /* "光敏电阻 PC1" */
+static const char STR_VOLTAGE[]    = {0xB5,0xE7,0xD1,0xB9,0x3A,0x00};                                /* "电压:" */
+
 #define WF_LEFT       36      /* 坐标系左边界 */
 #define WF_RIGHT      232     /* 坐标系右边界 (196像素宽, 19.6秒) */
 #define WF_TOP        168     /* 坐标系上边界 (对应 3.3V) */
@@ -136,7 +144,7 @@ int main(void)
     /* ---- UART 初始化 ---- */
     UART1_Init();
     UART1_SendString("=== ADC Timer Trigger: TIM2(100ms) -> ADC1_IN11(PC1) ===\r\n");
-    UART1_SendString("LCD: upper=value, lower=waveform | UART: ADC_value\\r\\n\r\n\r\n");
+    UART1_SendString("LCD: upper=value, lower=waveform | PA6=PWM wave out\r\n\r\n");
 
     /* ---- LCD 初始化 ---- */
     LCD_Init();
@@ -145,13 +153,13 @@ int main(void)
 
     /* ---- 标题栏 ---- */
     LCD_Fill(0, 0, 240, 40, DARKBLUE);
-    LCD_String(35, 8, "ADC Waveform", 16, WHITE, DARKBLUE);
+    LCD_String(30, 8, (char *)STR_TITLE, 16, WHITE, DARKBLUE);
     LCD_Line(0, 40, 240, 40, CYAN);
 
     /* ---- 上半部: 光敏电阻采样数值 ---- */
-    LCD_String(5,  50,  "Photoresistor PC1", 24, BLACK, GREEN);
+    LCD_String(5,  50,  (char *)STR_PHOTO,   24, BLACK, GREEN);
     LCD_String(5,  82,  "ADC:",  24, CYAN,  BLACK);
-    LCD_String(5,  115, "V  :",  24, CYAN,  BLACK);
+    LCD_String(5,  115, (char *)STR_VOLTAGE, 24, CYAN,  BLACK);
 
     /* ---- 分隔线 ---- */
     LCD_Line(5, 152, 235, 152, GRAY);
@@ -164,6 +172,9 @@ int main(void)
 
     /* ---- 启动 TIM2 (100ms TRGO) ---- */
     TIM2_TRGO_Init();
+
+    /* ---- 初始化 W25Q128 (中文字库) ---- */
+    W25Q128_Init();
 
     /* ---- 初始化 ADC + DMA ---- */
     adc_init();

@@ -182,3 +182,58 @@ void TIM2_TRGO_Init(void)
     TIM2->DIER  = 0U;                            /* 不使能中断 (仅 TRGO 输出)    */
     TIM2->CR1   = TIM_CR1_ARPE | TIM_CR1_CEN;   /* 自动重装载 + 启动计数器     */
 }
+
+/**
+ * @brief  TIM3 PWM 波形输出初始化 (PA6)
+ *
+ *         PA6 → TIM3_CH1 (AF2)
+ *         1kHz PWM 输出, 占空比由 ADC 采样值控制
+ *         外接 RC 滤波器即可得到模拟电压波形
+ *
+ *         PSC = 15  → 计数时钟 = 16MHz/16 = 1MHz
+ *         ARR = 999 → 周期 = 1ms (1kHz)
+ */
+void TIM3_WaveOut_Init(void)
+{
+    /* ---- GPIO: PA6 -> TIM3_CH1 ---- */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin       = GPIO_PIN_6;
+    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull      = GPIO_NOPULL;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /* ---- TIM3 基础配置 ---- */
+    __HAL_RCC_TIM3_CLK_ENABLE();
+
+    TIM3->PSC  = 15U;          /* 16MHz / 16 = 1MHz     */
+    TIM3->ARR  = 999U;         /* 1MHz / 1000 = 1kHz    */
+    TIM3->EGR  = TIM_EGR_UG;  /* 立即加载 PSC/ARR      */
+
+    /* ---- CH1: PWM 模式1 ---- */
+    TIM3->CCMR1 &= ~(TIM_CCMR1_OC1M | TIM_CCMR1_CC1S);
+    TIM3->CCMR1 |= (6U << TIM_CCMR1_OC1M_Pos);   /* PWM 模式1 */
+    TIM3->CCMR1 |= TIM_CCMR1_OC1PE;              /* 预装载使能 */
+    TIM3->CCER  |= TIM_CCER_CC1E;                /* CH1 输出使能 */
+    TIM3->CCR1  = 0U;                            /* 初始占空比 0 */
+
+    TIM3->CR1   = TIM_CR1_ARPE | TIM_CR1_CEN;   /* 自动重装载 + 启动 */
+}
+
+/**
+ * @brief  更新 PA6 PWM 占空比 (映射 ADC 采样值到波形输出)
+ * @param  adc_val: 12位 ADC 值 (0~4095)
+ *         映射: CCR1 = adc_val * 999 / 4096
+ *         PA6 输出 PWM → 经 RC 滤波 → 模拟电压波形
+ */
+void TIM3_WaveOut_Set(uint16_t adc_val)
+{
+    /* 映射 0~4095 → 0~999 */
+    uint32_t ccr = ((uint32_t)adc_val * 999UL) / 4095UL;
+    if (ccr > 999UL) ccr = 999UL;
+
+    TIM3->CCR1 = (uint16_t)ccr;
+}

@@ -18,6 +18,8 @@
 #include "adc.h"
 #include "uart.h"
 #include "dac.h"
+#include "key.h"
+#include "delay.h"
 #include "bsp_LCD_ILI9341.h"
 #include "bsp_W25Q128.h"
 #include <stdio.h>
@@ -32,6 +34,10 @@ static void SystemClock_Config(void);
 static const char STR_TITLE[]      = {0x41,0x44,0x43,0xB2,0xA8,0xD0,0xCE,0xCA,0xB5,0xD1,0xE9,0x00};  /* "ADC波形实验" */
 static const char STR_PHOTO[]      = {0xB9,0xE2,0xC3,0xF4,0xB5,0xE7,0xD7,0xE8,0x20,0x50,0x43,0x31,0x00}; /* "光敏电阻 PC1" */
 static const char STR_VOLTAGE[]    = {0xB5,0xE7,0xD1,0xB9,0x3A,0x00};                                /* "电压:" */
+static const char STR_NOISE[]      = {0xD4,0xEB,0xC9,0xF9,0xB2,0xA8,0x00};                          /* "噪声波" */
+static const char STR_TRIANGLE[]   = {0xC8,0xFD,0xBD,0xC7,0xB2,0xA8,0x00};                          /* "三角波" */
+static const char STR_DAC_MODE[]   = {0x44,0x41,0x43,0x20,0x50,0x41,0x35,0x3A,0x00};                /* "DAC PA5:" */
+static const char STR_KEY_HINT[]   = {0x4B,0x31,0x3A,0xD4,0xEB,0xC9,0xF9,0x20,0x4B,0x32,0x3A,0xC8,0xFD,0xBD,0xC7,0x00}; /* "K1:噪声 K2:三角" */
 
 #define WF_LEFT       36      /* 坐标系左边界 */
 #define WF_RIGHT      232     /* 坐标系右边界 (196像素宽, 19.6秒) */
@@ -171,11 +177,17 @@ int main(void)
     /* ---- 底部 ---- */
     LCD_Line(0, 315, 240, 315, CYAN);
 
+    /* ---- 初始化按键 ---- */
+    key_init();
+
     /* ---- 启动 TIM2 (100ms TRGO) ---- */
     TIM2_TRGO_Init();
 
-    /* ---- 启动 DAC 锯齿波输出 (PA4, TIM5 1ms 触发 + DMA) ---- */
-    DAC_Sawtooth_Init();
+    /* ---- 启动 DAC 波形发生器 (PA5, TIM6 触发, 默认三角波) ---- */
+    DAC_WaveGen_Init();
+
+    /* ---- 显示 DAC 模式初始状态 ---- */
+    LCD_String(5, 310, (char *)STR_KEY_HINT, 12, CYAN, BLACK);
 
     /* ---- 初始化 W25Q128 (中文字库) ---- */
     W25Q128_Init();
@@ -186,6 +198,27 @@ int main(void)
 
     while (1)
     {
+        /* ---- 按键扫描: 切换 DAC 波形模式 ---- */
+        uint8_t key = key_scan(0);  /* 0 = 不支持连按 */
+        if (key == KEY1_PRES)
+        {
+            DAC_WaveGen_SetType(WAVE_NOISE);
+            /* 更新 LCD 显示 */
+            LCD_Fill(80, 310, 235, 320, BLACK);
+            LCD_String(5,  310, (char *)STR_DAC_MODE, 12, CYAN, BLACK);
+            LCD_String(75, 310, (char *)STR_NOISE,    12, YELLOW, BLACK);
+            UART1_SendString("[DAC] PA5 → 噪声波 (Noise)\r\n");
+        }
+        else if (key == KEY2_PRES)
+        {
+            DAC_WaveGen_SetType(WAVE_TRIANGLE);
+            /* 更新 LCD 显示 */
+            LCD_Fill(80, 310, 235, 320, BLACK);
+            LCD_String(5,  310, (char *)STR_DAC_MODE,  12, CYAN, BLACK);
+            LCD_String(75, 310, (char *)STR_TRIANGLE,  12, YELLOW, BLACK);
+            UART1_SendString("[DAC] PA5 → 三角波 (Triangle)\r\n");
+        }
+
         /* 检查 DMA 是否有新数据 (每 100ms 一次) */
         if (g_adc_new_data)
         {

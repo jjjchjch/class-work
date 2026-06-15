@@ -1,12 +1,7 @@
 /**
  ****************************************************************************************************
  * @file        main.c
- * @brief       ADC→DAC 光敏实验 — 定时采样 + PA4 输出
- *
- *              光敏电阻分压 → PC1 (ADC1_IN11), 每 100ms 采样一次
- *              ADC 值 → DAC CH1 → PA4 电压输出
- *              示波器接 PA4 观察波形随光强变化
- *              串口同步打印 ADC 值和电压
+ * @brief       UART1 DMA 发送演示
  *
  *              STM32F407VET6, SYSCLK = 16MHz (HSI)
  ****************************************************************************************************
@@ -14,54 +9,32 @@
 
 #include "main.h"
 #include "gpio.h"
-#include "adc.h"
 #include "uart.h"
-#include "dac.h"
-#include <stdio.h>
 
 static void SystemClock_Config(void);
 
 int main(void)
 {
-    uint16_t adc_val;
-    uint32_t count = 0;
-
     HAL_Init();
     SystemClock_Config();
     MX_GPIO_Init();
 
-    /* ---- UART ---- */
+    /* ---- UART1 DMA 初始化 ---- */
     UART1_Init();
-    UART1_SendString("\r\n========================================\r\n");
-    UART1_SendString("  ADC->DAC 光敏实验 (定时采样)\r\n");
-    UART1_SendString("  PC1(ADC) -> PA4(DAC) 电压跟随\r\n");
-    UART1_SendString("  示波器接 PA4 观察光强变化\r\n");
-    UART1_SendString("========================================\r\n\r\n");
+    UART1_DMA_Init();
 
-    /* ---- 初始化 DAC (PA4 CH1, 软件触发) ---- */
-    DAC_Init();
-
-    /* ---- 初始化 ADC (PC1, CH11) ---- */
-    adc_init();
-
-    UART1_SendString("[OK] 启动完成, 每100ms采样一次\r\n\r\n");
+    /* ---- DMA 发送测试 (每次发送前等待上一次 DMA 完成) ---- */
 
     while (1)
     {
-        /* ADC 采样 */
-        adc_val = adc_read();
+        UART1_DMA_SendString("\r\n========================================\r\n");
+    while (UART1_DMA_IsBusy()) {}
+    UART1_DMA_SendString("  STM32F407 UART1 DMA TX Demo\r\n");
+    while (UART1_DMA_IsBusy()) {}
+    UART1_DMA_SendString("  DMA2 Stream7 Channel4 -> USART1_TX\r\n");
+    while (UART1_DMA_IsBusy()) {}
+    UART1_DMA_SendString("========================================\r\n\r\n");
 
-        /* DAC 输出 → PA4 电压 = adc_val × 3.3V / 4096 */
-        DAC_SetCh1(adc_val);
-
-        /* 串口打印 */
-        float v = adc_get_voltage_v(adc_val);
-        char buf[64];
-        sprintf(buf, "[%4lu] ADC=%4d  Vin=%.2fV  PA4=%.2fV\r\n",
-                count++, adc_val, (double)v, (double)v);
-        UART1_SendString(buf);
-
-        HAL_Delay(100);  /* 100ms 定时采样间隔 */
     }
 }
 

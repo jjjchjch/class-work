@@ -1,8 +1,9 @@
 /**
  ****************************************************************************************************
  * @file        main.c
- * @brief       TIM4 TRGO → ADC2 中断采样 → 串口打印
+ * @brief       TIM3 TRGO → ADC2 中断采样 → 串口 + LCD
  *              光敏电阻分压 → PC1 (ADC2_IN11), 10ms 间隔
+ *              每 100 个数据 LCD 显示完成 + 平均电压
  *              STM32F407VET6, SYSCLK = 16MHz (HSI)
  ****************************************************************************************************
  */
@@ -12,6 +13,7 @@
 #include "uart.h"
 #include "adc.h"
 #include "timer.h"
+#include "bsp_LCD_ILI9341.h"
 #include <stdio.h>
 
 static void SystemClock_Config(void);
@@ -26,11 +28,18 @@ int main(void)
     UART1_Init();
     UART1_DMA_Init();
 
-    /* 先发一条确认 UART 工作 */
-    UART1_DMA_SendString("\r\n=== ADC2 TIM4 TRGO Test ===\r\n");
+    UART1_DMA_SendString("\r\n=== ADC2 TIM3 TRGO Test ===\r\n");
     while (UART1_DMA_IsBusy()) {}
 
-    /* ---- TIM3 TRGO 10ms → ADC2 外部触发 (EXTSEL=8) ---- */
+    /* ---- LCD 初始化 ---- */
+    LCD_Init();
+    LCD_Fill(0, 0, LCD_WIDTH - 1, LED_HEIGHT - 1, BLACK);
+
+    LCD_String(10, 20, (char *)"ADC2 TIM3 TRGO", 24, YELLOW, BLACK);
+    LCD_String(10, 60, (char *)"PC1 -> ADC2 IN11", 16, CYAN, BLACK);
+    LCD_String(10, 90, (char *)"10ms Sample", 16, CYAN, BLACK);
+
+    /* ---- TIM3 TRGO 10ms → ADC2 (EXTSEL=8) ---- */
     TIM3_ADC_Trigger_Init();
 
     /* ---- ADC2 中断模式 ---- */
@@ -41,7 +50,7 @@ int main(void)
 
     while (1)
     {
-        /* 每个采样值实时打印 (10ms一次) */
+        /* 每个采样值实时串口打印 (10ms一次) */
         if (adc2_new_val)
         {
             adc2_new_val = 0;
@@ -53,7 +62,7 @@ int main(void)
             }
         }
 
-        /* 每 100 个值打印平均值 */
+        /* 每 100 个数据 → 串口平均值 + LCD 显示 */
         if (adc2_transfer_done == 1)
         {
             adc2_transfer_done = 0;
@@ -61,12 +70,28 @@ int main(void)
             float avg_v = adc2_get_average_v();
             float avg_raw = avg_v / (3.3f / 4096.0f);
 
+            /* ---- 串口 ---- */
             char buf[64];
             sprintf(buf, "--- Batch %lu: Avg=%.0f  Vin=%.3fV ---\r\n",
                     (unsigned long)adc2_transfer_cnt,
                     (double)avg_raw, (double)avg_v);
             UART1_DMA_SendString(buf);
             while (UART1_DMA_IsBusy()) {}
+
+            /* ---- LCD ---- */
+            LCD_Fill(10, 130, 230, 300, BLACK);
+
+            LCD_String(10, 140, (char *)"Transfer Done!", 24, GREEN, BLACK);
+
+            char lcd_buf[32];
+            sprintf(lcd_buf, "Count: %lu", (unsigned long)adc2_transfer_cnt);
+            LCD_String(10, 190, lcd_buf, 16, WHITE, BLACK);
+
+            sprintf(lcd_buf, "Avg: %.3f V", (double)avg_v);
+            LCD_String(10, 220, lcd_buf, 24, YELLOW, BLACK);
+
+            sprintf(lcd_buf, "ADC: %.0f", (double)avg_raw);
+            LCD_String(10, 260, lcd_buf, 16, WHITE, BLACK);
         }
     }
 }

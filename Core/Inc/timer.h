@@ -63,6 +63,25 @@ void TIM4_Breathe_Init(void);
 void TIM2_TRGO_Init(void);
 
 /**
+ * TIM3 TRGO 初始化 (10ms, 触发 ADC2)
+ *
+ * SYSCLK = 16MHz (HSI)
+ *   PSC = 15999 → 1kHz
+ *   ARR = 9     → 10ms
+ *   MMS = 010   → TRGO = 更新事件
+ *
+ * STM32F407 ADC EXTSEL=8 → TIM3_TRGO
+ */
+void TIM3_ADC_Trigger_Init(void);
+
+/**
+ * TIM4 TRGO 初始化 (10ms, 触发 ADC2) — 不可用!
+ * STM32F407 ADC 不支持 TIM4_TRGO 作为外部触发源.
+ * 保留仅作为普通定时器参考.
+ */
+void TIM4_ADC_Trigger_Init(void);
+
+/**
  * TIM3 PWM 波形输出 (PA6)
  *
  * 将 ADC 采样值通过 PWM 占空比输出到 PA6

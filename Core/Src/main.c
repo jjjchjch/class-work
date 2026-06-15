@@ -1,8 +1,8 @@
 /**
  ****************************************************************************************************
  * @file        main.c
- * @brief       UART1 DMA 发送演示
- *
+ * @brief       TIM4 TRGO → ADC2 中断采样 → 串口打印
+ *              光敏电阻分压 → PC1 (ADC2_IN11), 10ms 间隔
  *              STM32F407VET6, SYSCLK = 16MHz (HSI)
  ****************************************************************************************************
  */
@@ -10,6 +10,9 @@
 #include "main.h"
 #include "gpio.h"
 #include "uart.h"
+#include "adc.h"
+#include "timer.h"
+#include <stdio.h>
 
 static void SystemClock_Config(void);
 
@@ -19,19 +22,52 @@ int main(void)
     SystemClock_Config();
     MX_GPIO_Init();
 
-    /* ---- UART1 DMA 初始化 ---- */
+    /* ---- UART1 初始化 (DMA 发送) ---- */
     UART1_Init();
     UART1_DMA_Init();
 
-    /* ---- DMA 发送 200 行 "正点原子dma串口实验" ---- */
-    for (int i = 0; i < 200; i++)
-    {
-        UART1_DMA_SendString("正点原子dma串口实验\r\n");
-        while (UART1_DMA_IsBusy()) {}
-    }
+    /* 先发一条确认 UART 工作 */
+    UART1_DMA_SendString("\r\n=== ADC2 TIM4 TRGO Test ===\r\n");
+    while (UART1_DMA_IsBusy()) {}
+
+    /* ---- TIM3 TRGO 10ms → ADC2 外部触发 (EXTSEL=8) ---- */
+    TIM3_ADC_Trigger_Init();
+
+    /* ---- ADC2 中断模式 ---- */
+    adc2_init();
+
+    UART1_DMA_SendString("ADC2 started, waiting...\r\n");
+    while (UART1_DMA_IsBusy()) {}
 
     while (1)
     {
+        /* 每个采样值实时打印 (10ms一次) */
+        if (adc2_new_val)
+        {
+            adc2_new_val = 0;
+            char buf[16];
+            int len = snprintf(buf, sizeof(buf), "%d\r\n", adc2_latest);
+            if (len > 0) {
+                UART1_DMA_SendString(buf);
+                while (UART1_DMA_IsBusy()) {}
+            }
+        }
+
+        /* 每 100 个值打印平均值 */
+        if (adc2_transfer_done == 1)
+        {
+            adc2_transfer_done = 0;
+
+            float avg_v = adc2_get_average_v();
+            float avg_raw = avg_v / (3.3f / 4096.0f);
+
+            char buf[64];
+            sprintf(buf, "--- Batch %lu: Avg=%.0f  Vin=%.3fV ---\r\n",
+                    (unsigned long)adc2_transfer_cnt,
+                    (double)avg_raw, (double)avg_v);
+            UART1_DMA_SendString(buf);
+            while (UART1_DMA_IsBusy()) {}
+        }
     }
 }
 

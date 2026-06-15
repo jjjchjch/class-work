@@ -342,45 +342,8 @@ void TIM3_IRQHandler(void)
 }
 
 /**
- * @brief  TIM4 更新中断——软件PWM呼吸灯 (PB1 / LED2, 低电平点亮)
- *
- *         中断频率 20kHz；软件PWM 100步 → 200Hz
- *         每 2 个PWM周期（10ms）更新一次占空比
- *         0→99→0 共199步 × 10ms ≈ 2s 呼吸周期
+ * @brief  TIM4 中断 — 未使用 (TIM4 仅 TRGO 输出, 不使能中断)
  */
 void TIM4_IRQHandler(void)
 {
-    if (TIM4->SR & TIM_SR_UIF)
-    {
-        TIM4->SR = ~TIM_SR_UIF;              /* 清除中断标志                    */
-
-        static uint8_t pwm_cnt    = 0U;      /* 软件PWM步数 0-99             */
-        static uint8_t duty       = 0U;      /* 当前占空比  0-99             */
-        static uint8_t breath_dir = 1U;      /* 1=增亮  0=变暗               */
-        static uint8_t cycle_cnt  = 0U;      /* PWM完整周期计数            */
-
-        /* PB1 (LED2) 低电平点亮 */
-        if (pwm_cnt < duty)
-            GPIOB->BSRR = (uint32_t)GPIO_PIN_1 << 16U;  /* 低电平: 亮 */
-        else
-            GPIOB->BSRR = GPIO_PIN_1;                    /* 高电平: 灯灯 */
-
-        if (++pwm_cnt >= 100U)
-        {
-            pwm_cnt = 0U;
-            if (++cycle_cnt >= 2U)           /* 每 2 个PWM周期 = 10ms */
-            {
-                cycle_cnt = 0U;
-                if (breath_dir)
-                {
-                    if (++duty >= 99U) breath_dir = 0U;
-                }
-                else
-                {
-                    if (duty == 0U) breath_dir = 1U;
-                    else            duty--;
-                }
-            }
-        }
-    }
 }

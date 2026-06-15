@@ -184,6 +184,51 @@ void TIM2_TRGO_Init(void)
 }
 
 /**
+ * @brief  TIM3 TRGO 初始化 (10ms, 触发 ADC2)
+ *         直接寄存器操作, 与 TIM2_TRGO_Init 相同模式
+ *         STM32F407 ADC EXTSEL=8 → TIM3_TRGO ?
+ *
+ *         SYSCLK = 16MHz (HSI)
+ *         PSC = 15999 → 1kHz
+ *         ARR = 9     → 10ms
+ *         MMS = 010   → TRGO = 更新事件
+ */
+void TIM3_ADC_Trigger_Init(void)
+{
+    __HAL_RCC_TIM3_CLK_ENABLE();
+
+    TIM3->PSC  = 15999U;                         /* 16MHz / 16000 = 1kHz        */
+    TIM3->ARR  = 9U;                             /* 1kHz / 10 = 100Hz → 10ms    */
+    TIM3->EGR  = TIM_EGR_UG;                    /* 立即加载 PSC/ARR            */
+
+    /* MMS[2:0] = 010: 更新事件作为 TRGO 输出 */
+    TIM3->CR2  &= ~TIM_CR2_MMS;
+    TIM3->CR2  |=  TIM_TRGO_UPDATE;
+
+    TIM3->SR    = 0U;                            /* 清除所有中断标志             */
+    TIM3->DIER  = 0U;                            /* 不使能中断 (仅 TRGO 输出)    */
+    TIM3->CR1   = TIM_CR1_ARPE | TIM_CR1_CEN;   /* 自动重装载 + 启动计数器     */
+}
+
+/**
+ * @brief  TIM4 TRGO 初始化 (10ms) — 仅供参考!
+ *         STM32F407 ADC 不支持 TIM4_TRGO, 请用 TIM3_TRGO
+ */
+void TIM4_ADC_Trigger_Init(void)
+{
+    __HAL_RCC_TIM4_CLK_ENABLE();
+
+    TIM4->PSC  = 15999U;
+    TIM4->ARR  = 9U;
+    TIM4->EGR  = TIM_EGR_UG;
+    TIM4->CR2  &= ~TIM_CR2_MMS;
+    TIM4->CR2  |=  TIM_TRGO_UPDATE;
+    TIM4->SR    = 0U;
+    TIM4->DIER  = 0U;
+    TIM4->CR1   = TIM_CR1_ARPE | TIM_CR1_CEN;
+}
+
+/**
  * @brief  TIM3 PWM 波形输出初始化 (PA6)
  *
  *         PA6 → TIM3_CH1 (AF2)

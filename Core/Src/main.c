@@ -23,18 +23,15 @@ int main(void)
     UART1_Init();
     UART1_DMA_Init();
 
-    /* ---- DMA 发送测试 (每次发送前等待上一次 DMA 完成) ---- */
+    /* ---- DMA 发送 200 行 "正点原子dma串口实验" ---- */
+    for (int i = 0; i < 200; i++)
+    {
+        UART1_DMA_SendString("正点原子dma串口实验\r\n");
+        while (UART1_DMA_IsBusy()) {}
+    }
 
     while (1)
     {
-        UART1_DMA_SendString("\r\n========================================\r\n");
-    while (UART1_DMA_IsBusy()) {}
-    UART1_DMA_SendString("  STM32F407 UART1 DMA TX Demo\r\n");
-    while (UART1_DMA_IsBusy()) {}
-    UART1_DMA_SendString("  DMA2 Stream7 Channel4 -> USART1_TX\r\n");
-    while (UART1_DMA_IsBusy()) {}
-    UART1_DMA_SendString("========================================\r\n\r\n");
-
     }
 }
 

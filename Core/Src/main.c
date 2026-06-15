@@ -1,9 +1,13 @@
 /**
  ****************************************************************************************************
  * @file        main.c
- * @brief       TIM3 TRGO → ADC2 中断采样 → 串口 + LCD
- *              光敏电阻分压 → PC1 (ADC2_IN11), 10ms 间隔
- *              每 100 个数据 LCD 显示完成 + 平均电压
+ * @brief       DAC1 DMA 锯齿波 — TIM7 1ms 触发 + PA4 输出
+ *
+ *              锯齿波: 128 点 (0→4064, 步长 32)
+ *              TIM7 TRGO 每 1ms 触发一次 DAC1 转换
+ *              DMA1 Stream5 CH7 循环搬运数据
+ *              PA4 输出锯齿波 (128ms 周期)
+ *
  *              STM32F407VET6, SYSCLK = 16MHz (HSI)
  ****************************************************************************************************
  */
@@ -11,9 +15,8 @@
 #include "main.h"
 #include "gpio.h"
 #include "uart.h"
-#include "adc.h"
+#include "dac.h"
 #include "timer.h"
-#include "bsp_LCD_ILI9341.h"
 #include <stdio.h>
 
 static void SystemClock_Config(void);
@@ -24,75 +27,52 @@ int main(void)
     SystemClock_Config();
     MX_GPIO_Init();
 
-    /* ---- UART1 初始化 (DMA 发送) ---- */
+    /* ---- UART1 (DMA 发送) ---- */
     UART1_Init();
     UART1_DMA_Init();
 
-    UART1_DMA_SendString("\r\n=== ADC2 TIM3 TRGO Test ===\r\n");
+    UART1_DMA_SendString("\r\n=== DAC1 Sawtooth Wave ===\r\n");
+    while (UART1_DMA_IsBusy()) {}
+    UART1_DMA_SendString("TIM7 1ms TRGO, 128 points\r\n");
     while (UART1_DMA_IsBusy()) {}
 
-    /* ---- LCD 初始化 ---- */
-    LCD_Init();
-    LCD_Fill(0, 0, LCD_WIDTH - 1, LED_HEIGHT - 1, BLACK);
+    /* ---- TIM7 TRGO 1ms → DAC1 触发 ---- */
+    TIM7_DAC_Trigger_Init();
 
-    LCD_String(10, 20, (char *)"ADC2 TIM3 TRGO", 24, YELLOW, BLACK);
-    LCD_String(10, 60, (char *)"PC1 -> ADC2 IN11", 16, CYAN, BLACK);
-    LCD_String(10, 90, (char *)"10ms Sample", 16, CYAN, BLACK);
+    /* ---- DAC1 DMA 锯齿波初始化 ---- */
+    DAC_SAW_Init();
 
-    /* ---- TIM3 TRGO 10ms → ADC2 (EXTSEL=8) ---- */
-    TIM3_ADC_Trigger_Init();
+    /* 串口打印前 10 个锯齿波数据 */
+    UART1_DMA_SendString("Sawtooth data[0..9]: ");
+    while (UART1_DMA_IsBusy()) {}
+    for (int i = 0; i < 10; i++)
+    {
+        char buf[8];
+        int len = snprintf(buf, sizeof(buf), "%d ", dac_saw_buf[i]);
+        if (len > 0) {
+            UART1_DMA_SendString(buf);
+            while (UART1_DMA_IsBusy()) {}
+        }
+    }
+    UART1_DMA_SendString("\r\n");
+    while (UART1_DMA_IsBusy()) {}
 
-    /* ---- ADC2 中断模式 ---- */
-    adc2_init();
+    /* ---- 启动 DAC1 DMA 输出 ---- */
+    if (DAC_SAW_Start() != 0)
+    {
+        UART1_DMA_SendString("DAC DMA start FAILED!\r\n");
+        while (UART1_DMA_IsBusy()) {}
+        Error_Handler();
+    }
 
-    UART1_DMA_SendString("ADC2 started, waiting...\r\n");
+    /* DAC DMA 就绪后, 启动 TIM7 触发 */
+    TIM7_Start();
+
+    UART1_DMA_SendString("DAC1 DMA started! PA4 output sawtooth.\r\n");
     while (UART1_DMA_IsBusy()) {}
 
     while (1)
     {
-        /* 每个采样值实时串口打印 (10ms一次) */
-        if (adc2_new_val)
-        {
-            adc2_new_val = 0;
-            char buf[16];
-            int len = snprintf(buf, sizeof(buf), "%d\r\n", adc2_latest);
-            if (len > 0) {
-                UART1_DMA_SendString(buf);
-                while (UART1_DMA_IsBusy()) {}
-            }
-        }
-
-        /* 每 100 个数据 → 串口平均值 + LCD 显示 */
-        if (adc2_transfer_done == 1)
-        {
-            adc2_transfer_done = 0;
-
-            float avg_v = adc2_get_average_v();
-            float avg_raw = avg_v / (3.3f / 4096.0f);
-
-            /* ---- 串口 ---- */
-            char buf[64];
-            sprintf(buf, "--- Batch %lu: Avg=%.0f  Vin=%.3fV ---\r\n",
-                    (unsigned long)adc2_transfer_cnt,
-                    (double)avg_raw, (double)avg_v);
-            UART1_DMA_SendString(buf);
-            while (UART1_DMA_IsBusy()) {}
-
-            /* ---- LCD ---- */
-            LCD_Fill(10, 130, 230, 300, BLACK);
-
-            LCD_String(10, 140, (char *)"Transfer Done!", 24, GREEN, BLACK);
-
-            char lcd_buf[32];
-            sprintf(lcd_buf, "Count: %lu", (unsigned long)adc2_transfer_cnt);
-            LCD_String(10, 190, lcd_buf, 16, WHITE, BLACK);
-
-            sprintf(lcd_buf, "Avg: %.3f V", (double)avg_v);
-            LCD_String(10, 220, lcd_buf, 24, YELLOW, BLACK);
-
-            sprintf(lcd_buf, "ADC: %.0f", (double)avg_raw);
-            LCD_String(10, 260, lcd_buf, 16, WHITE, BLACK);
-        }
     }
 }
 

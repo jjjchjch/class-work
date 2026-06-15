@@ -184,6 +184,39 @@ void TIM2_TRGO_Init(void)
 }
 
 /**
+ * @brief  TIM7 TRGO 初始化 (1ms, 触发 DAC1)
+ *
+ *         APB1 = 16MHz
+ *         PSC = 15   → 1MHz
+ *         ARR = 999  → 1ms
+ *         MMS = 010  → TRGO = 更新事件
+ */
+void TIM7_DAC_Trigger_Init(void)
+{
+    __HAL_RCC_TIM7_CLK_ENABLE();
+
+    TIM7->PSC  = 15U;                            /* 16MHz / 16 = 1MHz           */
+    TIM7->ARR  = 999U;                           /* 1MHz / 1000 = 1ms           */
+    TIM7->EGR  = TIM_EGR_UG;                    /* 立即加载 PSC/ARR            */
+
+    /* MMS[2:0] = 010: 更新事件作为 TRGO 输出 */
+    TIM7->CR2  &= ~TIM_CR2_MMS;
+    TIM7->CR2  |=  TIM_TRGO_UPDATE;
+
+    TIM7->SR    = 0U;                            /* 清除所有中断标志             */
+    TIM7->DIER  = 0U;                            /* 不使能中断 (仅 TRGO 输出)    */
+    /* 注意: 不立即启动, 由 TIM7_Start() 在 DAC DMA 就绪后调用 */
+}
+
+/**
+ * @brief  启动 TIM7 (应在 DAC DMA 就绪后调用)
+ */
+void TIM7_Start(void)
+{
+    TIM7->CR1 = TIM_CR1_ARPE | TIM_CR1_CEN;     /* 自动重装载 + 启动计数器     */
+}
+
+/**
  * @brief  TIM3 TRGO 初始化 (10ms, 触发 ADC2)
  *         直接寄存器操作, 与 TIM2_TRGO_Init 相同模式
  *         STM32F407 ADC EXTSEL=8 → TIM3_TRGO ?

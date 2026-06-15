@@ -242,3 +242,97 @@ void TIM6_DAC_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&TIM6_Handler);
 }
+
+/* ================================================================
+ * DAC1 DMA 锯齿波 (TIM7 TRGO 触发, 128点)
+ *
+ * 硬件: PA4 (DAC_OUT1) → 示波器
+ *       TIM7 TRGO → DAC1 外部触发 (1ms)
+ *       DMA1 Stream5 CH7 → 循环搬运 128 个半字
+ *
+ * 锯齿波: 0 → 32 → 64 → ... → 4064 (128步, 步长=32)
+ *         128 × 1ms = 128ms 一个完整周期
+ * ================================================================ */
+
+static DAC_HandleTypeDef hdac_saw;
+static DMA_HandleTypeDef hdma_dac1;
+uint32_t dac_saw_buf[DAC_SAW_STEPS];          /* uint32_t, DMA WORD 对齐 */
+
+/**
+ * @brief  生成 128 点锯齿波表 (12位值, 存于低12位)
+ */
+static void DAC_GenSawTable(void)
+{
+    uint32_t step = 4096U / DAC_SAW_STEPS;    /* 步长 = 32 */
+    for (uint32_t i = 0; i < DAC_SAW_STEPS; i++)
+    {
+        dac_saw_buf[i] = i * step;            /* 0, 32, 64, ..., 4064 */
+    }
+}
+
+/**
+ * @brief  DAC1 DMA 初始化 (TIM7 TRGO, 锯齿波)
+ */
+void DAC_SAW_Init(void)
+{
+    /* ---- 1. 生成锯齿波数据 ---- */
+    DAC_GenSawTable();
+
+    /* ---- 2. GPIO: PA4 模拟输出 ---- */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+
+    GPIO_InitTypeDef gpio = {0};
+    gpio.Pin  = GPIO_PIN_4;
+    gpio.Mode = GPIO_MODE_ANALOG;
+    gpio.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &gpio);
+
+    /* ---- 3. DMA1 Stream5 CH7 (DAC1) ---- */
+    __HAL_RCC_DMA1_CLK_ENABLE();
+
+    hdma_dac1.Instance                 = DMA1_Stream5;
+    hdma_dac1.Init.Channel             = DMA_CHANNEL_7;
+    hdma_dac1.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+    hdma_dac1.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_dac1.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_dac1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_dac1.Init.MemDataAlignment    = DMA_MDATAALIGN_WORD;
+    hdma_dac1.Init.Mode                = DMA_CIRCULAR;
+    hdma_dac1.Init.Priority            = DMA_PRIORITY_HIGH;
+    hdma_dac1.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+
+    if (HAL_DMA_Init(&hdma_dac1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    __HAL_LINKDMA(&hdac_saw, DMA_Handle1, hdma_dac1);
+
+    /* ---- 4. DAC1 时钟 & 初始化 ---- */
+    __HAL_RCC_DAC_CLK_ENABLE();
+
+    hdac_saw.Instance = DAC;
+    HAL_DAC_Init(&hdac_saw);
+
+    /* ---- 5. CH1 (PA4): TIM7 TRGO 硬件触发 ---- */
+    DAC_ChannelConfTypeDef ch = {0};
+    ch.DAC_Trigger      = DAC_TRIGGER_T7_TRGO;
+    ch.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
+
+    HAL_DAC_ConfigChannel(&hdac_saw, &ch, DAC_CHANNEL_1);
+}
+
+/**
+ * @brief  启动 DAC1 DMA 锯齿波输出
+ * @retval 0=成功, -1=失败
+ */
+int DAC_SAW_Start(void)
+{
+    if (HAL_DAC_Start_DMA(&hdac_saw, DAC_CHANNEL_1,
+                          dac_saw_buf, DAC_SAW_STEPS,
+                          DAC_ALIGN_12B_R) != HAL_OK)
+    {
+        return -1;
+    }
+    return 0;
+}

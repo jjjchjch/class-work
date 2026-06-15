@@ -44,4 +44,13 @@ WaveType_t DAC_WaveGen_GetType(void);                 /* 获取当前波形类型 */
 /* ---- TIM6 中断回调 ---- */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 
+/* ==================== DAC1 DMA 锯齿波 (TIM7 TRGO, 128点) ==================== */
+
+#define DAC_SAW_STEPS  128U
+
+extern uint32_t dac_saw_buf[DAC_SAW_STEPS];
+
+void DAC_SAW_Init(void);      /* 生成锯齿波表 + DAC1 DMA 初始化 */
+int  DAC_SAW_Start(void);     /* 启动 DAC1 DMA → 返回 0=成功, -1=失败 */
+
 #endif /* __DAC_H */

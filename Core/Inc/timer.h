@@ -75,6 +75,17 @@ void TIM2_TRGO_Init(void);
 void TIM3_ADC_Trigger_Init(void);
 
 /**
+ * TIM7 TRGO 初始化 (1ms, 触发 DAC1)
+ *
+ * SYSCLK = 16MHz (HSI), APB1 = 16MHz
+ *   PSC = 15    → 1MHz (1us/tick)
+ *   ARR = 999   → 1ms 周期
+ *   MMS = 010   → TRGO = 更新事件
+ */
+void TIM7_DAC_Trigger_Init(void);
+void TIM7_Start(void);           /* 单独启动 TIM7 (应在 DAC DMA 就绪后调用) */
+
+/**
  * TIM4 TRGO 初始化 (10ms, 触发 ADC2) — 不可用!
  * STM32F407 ADC 不支持 TIM4_TRGO 作为外部触发源.
  * 保留仅作为普通定时器参考.

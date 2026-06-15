@@ -13,7 +13,8 @@
 *.hex
 *.map
 *.lst
-
+*.ninja_deps
+*.ninja_log
 # Editor workspace (keep shared tasks)
 .vscode/*
 !.vscode/tasks.json

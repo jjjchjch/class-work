@@ -202,8 +202,7 @@ float adc2_get_average_v(void)
  * ================================================================ */
 
 /**
- * @brief  ADC 转换完成回调 (每次 TIM4 触发 → 一次 ADC 转换 → 进入此回调)
- *         参照魔女科技例程: 在回调中读取 ADC 值, 存入缓冲区
+ * @brief  ADC 转换完成回调 (ADC1 和 ADC2 共用)
  */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
@@ -225,6 +224,12 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
             adc2_transfer_done = 1;
         }
     }
+    else if (hadc->Instance == ADC1)
+    {
+        /* ADC1 定时触发采样: 由 main.c 中的回调逻辑处理 */
+        extern void ADC1_ConvCpltCallback(uint16_t val);
+        ADC1_ConvCpltCallback(HAL_ADC_GetValue(hadc));
+    }
 }
 
 /**
@@ -234,4 +239,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 void ADC_IRQHandler(void)
 {
     HAL_ADC_IRQHandler(&hadc2);
+    extern ADC_HandleTypeDef hadc1;
+    HAL_ADC_IRQHandler(&hadc1);
 }

@@ -1,18 +1,19 @@
 /**
  ****************************************************************************************************
  * @file        main.c
- * @brief       W25Q128 SPI 读写验证实验 (LCD + UART 双输出)
+ * @brief       ADC1 定时触发采样 + W25Q128 存储实验
  *
  *              硬件: STM32F407VET6 + ILI9341 2.8寸 LCD (FSMC, 240×320, RGB565)
  *                    W25Q128 Flash: CS=PC13, SCK=PA5, MISO=PA6, MOSI=PA7 (SPI1)
- *                    KEY1=PA0(下拉,按下高), KEY2=PA1(上拉,按下低)
+ *                    KEY1=PA0(下拉,按下高)
+ *                    ADC1_IN2=PA2 (0~3V, 10Hz 正弦波输入)
  *                    UART1: PA9(TX), PA10(RX), 115200-8-N-1
  *
  *              功能:
- *              - KEY1: 向 W25Q128 0x1000 写入 "2023014085 金成昊"(GBK)
- *              - KEY2: 从 W25Q128 0x1000 读出, 逐字节比对验证
- *              - LCD 显示实时数据和操作结果 (中文用拼音 JinChengHao)
- *              - 串口同步打印详细 Hex 数据和状态
+ *              - TIM3 TRGO 每 10ms 触发 ADC1 转换 (PA2)
+ *              - KEY1 启动采样, 采集 256 个结果存入 W25Q128 0x2000
+ *              - LCD 简洁显示采样进度和结果
+ *              - UART 同步打印采样数据
  *
  *              系统时钟: 16MHz HSI
  ****************************************************************************************************
@@ -22,64 +23,34 @@
 #include "key.h"
 #include "delay.h"
 #include "uart.h"
+#include "timer.h"
 #include "bsp_LCD_ILI9341.h"
 #include "bsp_W25Q128.h"
 #include <string.h>
 #include <stdio.h>
 
 /*===========================================================================
- * 常量定义
+ * ADC 采样配置
  *===========================================================================*/
-#define TEST_ADDR           0x00001000  /* W25Q128 写入地址 (避开字库区) */
+#define ADC_SAMPLE_COUNT    256             /* 采样点数 */
+#define ADC_STORE_ADDR      0x00002000      /* W25Q128 存储地址 */
 
-/* 测试数据: "2023014085 金成昊" — GBK 编码 */
-/* LCD 上中文无法显示, 用拼音 JinChengHao 代替 */
-static const uint8_t g_testData[] = {
-    '2', '0', '2', '3', '0', '1', '4', '0', '8', '5', ' ',
-    0xBD, 0xF0,     /* 金 (GBK) */
-    0xB3, 0xC9,     /* 成 (GBK) */
-    0xEA, 0xBB,     /* 昊 (GBK) */
-};
-#define TEST_DATA_LEN   (sizeof(g_testData))
+/* 采样缓冲区 (RAM) */
+static volatile uint16_t g_adcBuf[ADC_SAMPLE_COUNT];
+static volatile uint16_t g_adcIdx    = 0;   /* 当前采样索引 */
+static volatile uint8_t  g_adcDone   = 0;   /* 采样完成标志 */
+static volatile uint8_t  g_sampling  = 0;   /* 正在采样标志 */
 
-/* 拼音版字符串, 供 LCD 显示 */
-#define TEST_STR_PINYIN "2023014085 JinChengHao"
-
-/* 读写缓冲区 */
-static uint8_t g_readBuf[TEST_DATA_LEN];
+/* ADC1 HAL 句柄 (供 adc.c 中断使用) */
+ADC_HandleTypeDef hadc1 = {0};
 
 /*===========================================================================
- * 操作状态
- *===========================================================================*/
-typedef enum {
-    OP_NONE = 0,
-    OP_WRITE_OK,
-    OP_WRITE_FAIL,
-    OP_READ_OK,
-    OP_READ_FAIL,
-} OpStatus_t;
-
-static volatile OpStatus_t g_lastOp = OP_NONE;
-
-/*===========================================================================
- * 串口打印辅助 (UART1, 115200bps, PA9/PA10)
+ * 串口打印辅助
  *===========================================================================*/
 
 static void UART_Println(const char *msg)
 {
     UART1_SendString(msg);
-    UART1_SendString("\r\n");
-}
-
-static void UART_PrintHex(const char *label, const uint8_t *data, uint16_t len)
-{
-    char buf[8];
-    UART1_SendString(label);
-    for (uint16_t i = 0; i < len; i++)
-    {
-        sprintf(buf, "%02X ", data[i]);
-        UART1_SendString(buf);
-    }
     UART1_SendString("\r\n");
 }
 
@@ -89,222 +60,251 @@ static void UART_PrintSep(void)
 }
 
 /*===========================================================================
- * LCD 辅助函数
+ * LCD 简洁界面
  *===========================================================================*/
 
-/**
- * @brief  绘制 LCD 主界面框架 (只画一次)
- */
 static void LCD_DrawUI(void)
 {
     LCD_Fill(0, 0, LCD_WIDTH - 1, LED_HEIGHT - 1, BLACK);
 
-    /* 标题栏 */
-    LCD_Fill(0, 0, LCD_WIDTH - 1, 30, 0x2104);
-    LCD_String(30, 4, (char *)"W25Q128 R/W Test", 16, WHITE, 0x2104);
-    LCD_Fill(0, 30, LCD_WIDTH - 1, 32, GREEN);
+    /* 标题 */
+    LCD_Fill(0, 0, LCD_WIDTH - 1, 32, 0x2104);
+    LCD_String(30, 5, (char *)"ADC Sampling Test", 16, WHITE, 0x2104);
+    LCD_Fill(0, 32, LCD_WIDTH - 1, 34, GREEN);
 
-    /* 系统信息 */
-    LCD_String(5, 38,  (char *)"MCU:STM32F407  LCD:ILI9341", 12, CYAN, BLACK);
-    LCD_String(5, 54,  (char *)"SPI1:PA5/6/7  CS:PC13", 12, CYAN, BLACK);
-    LCD_String(5, 70,  (char *)"UART1:PA9/10  115200bps", 12, CYAN, BLACK);
-    LCD_Fill(0, 88, LCD_WIDTH - 1, 90, GREEN);
+    /* 信息 */
+    LCD_String(5, 42, (char *)"ADC1: PA2  0~3V  10Hz Sine", 12, CYAN, BLACK);
+    LCD_String(5, 60, (char *)"Trigger: TIM3 TRGO  10ms", 12, CYAN, BLACK);
+    LCD_String(5, 78, (char *)"Store: W25Q128 @ 0x2000", 12, CYAN, BLACK);
+    LCD_Fill(0, 98, LCD_WIDTH - 1, 100, GREEN);
 
     /* 操作提示 */
-    LCD_String(5, 96,  (char *)"[KEY1] Write  [KEY2] Read+Verify", 16, WHITE, BLACK);
-    LCD_Fill(0, 120, LCD_WIDTH - 1, 122, GREEN);
+    LCD_String(5, 108, (char *)"[KEY1] Start Sampling 256pts", 16, WHITE, BLACK);
+    LCD_Fill(0, 136, LCD_WIDTH - 1, 138, GREEN);
 
-    /* 数据预览 */
-    LCD_String(5, 128, (char *)"Test Data:", 12, YELLOW, BLACK);
-    LCD_String(5, 148, (char *)TEST_STR_PINYIN, 16, 0xFFE0, BLACK);
-
-    /* 结果区标签 */
-    LCD_Fill(0, 180, LCD_WIDTH - 1, 182, GREEN);
-    LCD_String(5, 188, (char *)"Result:", 12, YELLOW, BLACK);
+    /* 状态区标签 */
+    LCD_String(5, 146, (char *)"Status:", 12, YELLOW, BLACK);
 }
 
-/**
- * @brief  清除 LCD 结果区域
- */
-static void LCD_ClearResultArea(void)
+static void LCD_ShowStatus(const char *msg, uint16_t color)
 {
-    LCD_Fill(0, 204, LCD_WIDTH - 1, LED_HEIGHT - 1, BLACK);
+    LCD_Fill(5, 168, LCD_WIDTH - 6, 250, BLACK);
+    LCD_String(5, 170, (char *)msg, 16, color, BLACK);
 }
 
-/**
- * @brief  LCD 显示操作中的数据 (拼音)
- */
-static void LCD_ShowOpData(const char *opName, uint16_t color)
+static void LCD_ShowProgress(uint16_t n)
 {
-    LCD_ClearResultArea();
-
-    char buf[48];
-    uint16_t y = 210;
-
-    sprintf(buf, "[%s]", opName);
-    LCD_String(5, y, buf, 16, color, BLACK);
-    y += 24;
-
-    LCD_String(5, y, (char *)TEST_STR_PINYIN, 16, WHITE, BLACK);
-    y += 22;
-
-    sprintf(buf, "Addr:0x%08lX", (unsigned long)TEST_ADDR);
-    LCD_String(5, y, buf, 12, 0x8410, BLACK);
+    char buf[32];
+    LCD_Fill(5, 168, LCD_WIDTH - 6, 210, BLACK);
+    sprintf(buf, "Sampling... %u / %u", n, ADC_SAMPLE_COUNT);
+    LCD_String(5, 172, buf, 16, YELLOW, BLACK);
 }
 
-/**
- * @brief  LCD 显示验证结果 (通过/失败)
- */
-static void LCD_ShowVerifyResult(uint8_t passed)
-{
-    LCD_ClearResultArea();
-    uint16_t y = 210;
+/*===========================================================================
+ * LCD 波形绘制 (显示前 N 个采样点, 约 6 个正弦周期)
+ *===========================================================================*/
 
-    if (passed)
+#define WAV_X0      10
+#define WAV_Y0      135
+#define WAV_X1      230
+#define WAV_Y1      290
+#define WAV_W       (WAV_X1 - WAV_X0)   /* 220 像素 */
+#define WAV_H       (WAV_Y1 - WAV_Y0)   /* 155 像素 */
+#define WAV_DISP_CNT 60                  /* 显示前60点 (6个周期, 10Hz/100Hz) */
+
+static void LCD_DrawWaveform(void)
+{
+    char buf[32];
+    uint16_t i;
+    uint16_t cnt = (ADC_SAMPLE_COUNT < WAV_DISP_CNT) ? ADC_SAMPLE_COUNT : WAV_DISP_CNT;
+
+    /* ---- 清除波形区域 ---- */
+    LCD_Fill(0, 132, LCD_WIDTH - 1, LED_HEIGHT - 1, BLACK);
+
+    /* ---- 标题 ---- */
+    LCD_String(5, 137, (char *)"ADC Waveform (PA2) 10Hz Sine", 12, CYAN, BLACK);
+
+    /* ---- 外框 ---- */
+    LCD_Fill(WAV_X0 - 1, WAV_Y0 - 1, WAV_X1 + 1, WAV_Y1 + 1, 0x18E3);
+    LCD_Fill(WAV_X0, WAV_Y0, WAV_X1, WAV_Y1, BLACK);
+
+    /* ---- 水平网格: 3.0V, 1.5V, 0V ---- */
+    uint16_t midY = WAV_Y0 + WAV_H / 2;
+    LCD_Line(WAV_X0, WAV_Y0, WAV_X1, WAV_Y0, 0x39E7);  /* 顶部 3.3V */
+    LCD_Line(WAV_X0, midY,   WAV_X1, midY,   0x3186);  /* 中间 1.65V */
+    LCD_Line(WAV_X0, WAV_Y1, WAV_X1, WAV_Y1, 0x39E7);  /* 底部 0V */
+
+    /* ---- Y 轴标签 ---- */
+    LCD_String(WAV_X1 + 4, WAV_Y0 - 4, (char *)"3.3V", 12, 0x8410, BLACK);
+    LCD_String(WAV_X1 + 4, midY   - 4, (char *)"1.6V", 12, 0x8410, BLACK);
+    LCD_String(WAV_X1 + 4, WAV_Y1 - 6, (char *)"0.0V", 12, 0x8410, BLACK);
+
+    /* ---- 绘制波形 (连线, 只画前 cnt 个点) ---- */
+    for (i = 1; i < cnt; i++)
     {
-        LCD_String(5, y, (char *)"[VERIFY] PASSED!", 16, GREEN, BLACK);
-        y += 24;
-        LCD_String(5, y, (char *)"Read == Write  OK", 12, GREEN, BLACK);
-        y += 22;
-        LCD_String(5, y, (char *)TEST_STR_PINYIN, 16, WHITE, BLACK);
+        uint16_t x0 = WAV_X0 + (uint16_t)((uint32_t)(i - 1) * WAV_W / (cnt - 1));
+        uint16_t x1 = WAV_X0 + (uint16_t)((uint32_t)i       * WAV_W / (cnt - 1));
+
+        uint16_t y0 = WAV_Y1 - (uint16_t)((uint32_t)g_adcBuf[i - 1] * WAV_H / 4095);
+        uint16_t y1 = WAV_Y1 - (uint16_t)((uint32_t)g_adcBuf[i]     * WAV_H / 4095);
+
+        if (y0 < WAV_Y0) y0 = WAV_Y0;
+        if (y1 < WAV_Y0) y1 = WAV_Y0;
+        if (y0 > WAV_Y1) y0 = WAV_Y1;
+        if (y1 > WAV_Y1) y1 = WAV_Y1;
+
+        LCD_Line(x0, y0, x1, y1, YELLOW);
     }
-    else
+
+    /* ---- Vpp 信息 ---- */
+    uint16_t vmin = 4095, vmax = 0;
+    for (i = 0; i < ADC_SAMPLE_COUNT; i++)
     {
-        LCD_String(5, y, (char *)"[VERIFY] FAILED!", 16, RED, BLACK);
-        y += 24;
-        LCD_String(5, y, (char *)"Mismatch! See UART", 12, RED, BLACK);
+        if (g_adcBuf[i] < vmin) vmin = g_adcBuf[i];
+        if (g_adcBuf[i] > vmax) vmax = g_adcBuf[i];
+    }
+    sprintf(buf, "Vpp=%.2fV  %u pts", (float)(vmax - vmin) * 3.3f / 4096.0f, ADC_SAMPLE_COUNT);
+    LCD_String(5, 298, buf, 12, 0xFFE0, BLACK);
+    LCD_String(140, 298, (char *)"Saved W25Q128", 12, 0x8410, BLACK);
+}
+
+/*===========================================================================
+ * ADC1 定时触发采样 (TIM3 TRGO, 10ms)
+ *===========================================================================*/
+
+/**
+ * @brief  ADC1 PA2 初始化 (TIM3 TRGO 外部触发, 中断模式)
+ *
+ *         PA2 → ADC1_IN2, 模拟输入
+ *         触发源: TIM3 TRGO (每 10ms 触发一次)
+ *         EOC 中断 → adc.c HAL_ADC_ConvCpltCallback → ADC1_ConvCpltCallback
+ */
+static void ADC1_PA2_Init(void)
+{
+    /* ---- GPIO: PA2 模拟输入 ---- */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+
+    GPIO_InitTypeDef gpio = {0};
+    gpio.Pin  = GPIO_PIN_2;
+    gpio.Mode = GPIO_MODE_ANALOG;
+    gpio.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &gpio);
+
+    /* ---- ADC1 配置 ---- */
+    __HAL_RCC_ADC1_CLK_ENABLE();
+
+    hadc1.Instance                   = ADC1;
+    hadc1.Init.ClockPrescaler        = ADC_CLOCKPRESCALER_PCLK_DIV4;   /* 4MHz */
+    hadc1.Init.Resolution            = ADC_RESOLUTION_12B;
+    hadc1.Init.DataAlign             = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.ScanConvMode          = DISABLE;
+    hadc1.Init.EOCSelection          = ADC_EOC_SINGLE_CONV;
+    hadc1.Init.ContinuousConvMode    = DISABLE;
+    hadc1.Init.NbrOfConversion       = 1;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.NbrOfDiscConversion   = 0;
+    hadc1.Init.ExternalTrigConv      = ADC_EXTERNALTRIGCONV_T3_TRGO;    /* TIM3 TRGO */
+    hadc1.Init.ExternalTrigConvEdge  = ADC_EXTERNALTRIGCONVEDGE_RISING;
+    hadc1.Init.DMAContinuousRequests = DISABLE;
+
+    HAL_ADC_Init(&hadc1);
+
+    /* ---- 通道 CH2 (PA2) ---- */
+    ADC_ChannelConfTypeDef ch = {0};
+    ch.Channel      = ADC_CHANNEL_2;
+    ch.Rank         = 1;
+    ch.SamplingTime = ADC_SAMPLETIME_480CYCLES;
+    ch.Offset       = 0;
+    HAL_ADC_ConfigChannel(&hadc1, &ch);
+
+    /* ---- ADC 中断使能 ---- */
+    HAL_NVIC_SetPriority(ADC_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(ADC_IRQn);
+}
+
+/**
+ * @brief  启动 ADC 采样 (使能 TIM3 + ADC1 中断)
+ */
+static void ADC1_StartSampling(void)
+{
+    g_adcIdx   = 0;
+    g_adcDone  = 0;
+    g_sampling = 1;
+    memset((void *)g_adcBuf, 0, sizeof(g_adcBuf));
+
+    /* 启动 ADC1 中断模式 (等待 TIM3 TRGO) */
+    HAL_ADC_Start_IT(&hadc1);
+
+    /* 启动 TIM3 (TRGO 输出) */
+    TIM3_ADC_Trigger_Init();
+}
+
+/**
+ * @brief  停止 ADC 采样
+ */
+static void ADC1_StopSampling(void)
+{
+    HAL_ADC_Stop_IT(&hadc1);
+    TIM3->CR1 &= ~TIM_CR1_CEN;      /* 停止 TIM3 */
+    g_sampling = 0;
+}
+
+/**
+ * @brief  ADC1 转换完成回调 (由 adc.c HAL_ADC_ConvCpltCallback 调用)
+ *         每次 TIM3 TRGO 触发 → ADC 转换完成 → 进入此函数
+ */
+void ADC1_ConvCpltCallback(uint16_t val)
+{
+    if (!g_sampling) return;
+
+    g_adcBuf[g_adcIdx++] = val;
+
+    if (g_adcIdx >= ADC_SAMPLE_COUNT)
+    {
+        g_adcDone = 1;
+        ADC1_StopSampling();
     }
 }
 
 /*===========================================================================
- * W25Q128 操作 (含 LCD + UART 双输出)
+ * W25Q128 存储 ADC 数据
  *===========================================================================*/
 
 /**
- * @brief  KEY1: 写入数据并回读确认
+ * @brief  将 256 个 ADC 采样值保存到 W25Q128
  * @retval 0=成功, 1=失败
  */
-static uint8_t W25Q128_DoWrite(void)
+static uint8_t SaveToW25Q128(void)
 {
-    if (xW25Q128.FlagInit == 0)
-    {
-        UART_Println("[WRITE] ERROR: W25Q128 not init!");
-        return 1;
-    }
+    if (xW25Q128.FlagInit == 0) return 1;
 
-    /* ---- 串口打印写入信息 ---- */
-    UART_PrintSep();
-    UART_Println(">>> [KEY1] WRITE Operation <<<");
-    UART_PrintHex("    Write Data  : ", g_testData, TEST_DATA_LEN);
+    UART_Println("Writing ADC samples to W25Q128...");
+
+    /* 256 个 uint16_t = 512 字节 */
+    W25Q128_WriteData(ADC_STORE_ADDR, (uint8_t *)g_adcBuf,
+                      ADC_SAMPLE_COUNT * sizeof(uint16_t));
+
+    /* 回读验证前几个值 */
+    uint16_t verify[4];
+    W25Q128_ReadData(ADC_STORE_ADDR, (uint8_t *)verify, sizeof(verify));
+
+    UART_Println("Verify first 4 samples:");
+    for (int i = 0; i < 4; i++)
     {
         char buf[48];
-        sprintf(buf, "    Address     : 0x%08lX", (unsigned long)TEST_ADDR);
-        UART_Println(buf);
-        sprintf(buf, "    Length      : %u bytes", (unsigned int)TEST_DATA_LEN);
+        sprintf(buf, "  [%d] Wrote=%u  Read=%u  %s",
+                i, g_adcBuf[i], verify[i],
+                (g_adcBuf[i] == verify[i]) ? "OK" : "FAIL");
         UART_Println(buf);
     }
-    UART_Println("    Content(PY) : 2023014085 JinChengHao");
 
-    /* ---- LCD 显示正在写入的数据 ---- */
-    LCD_ShowOpData("WRITE", YELLOW);
-
-    /* ---- 执行写入 ---- */
-    W25Q128_WriteData(TEST_ADDR, (uint8_t *)g_testData, TEST_DATA_LEN);
-    UART_Println("    -> W25Q128_WriteData() done");
-
-    /* ---- 回读验证 ---- */
-    uint8_t verifyBuf[TEST_DATA_LEN];
-    memset(verifyBuf, 0, TEST_DATA_LEN);
-    W25Q128_ReadData(TEST_ADDR, verifyBuf, TEST_DATA_LEN);
-
-    UART_PrintHex("    Read Back   : ", verifyBuf, TEST_DATA_LEN);
-
-    if (memcmp(g_testData, verifyBuf, TEST_DATA_LEN) == 0)
+    if (memcmp((const void *)g_adcBuf, verify, sizeof(verify)) == 0)
     {
-        UART_Println("    [WRITE] SUCCESS! Data verified.");
-        LCD_ShowVerifyResult(1);
-        UART_PrintSep();
+        UART_Println("Save to W25Q128 SUCCESS!");
         return 0;
     }
-    else
-    {
-        UART_Println("    [WRITE] FAILED! Data mismatch.");
-        for (uint16_t i = 0; i < TEST_DATA_LEN; i++)
-        {
-            if (g_testData[i] != verifyBuf[i])
-            {
-                char buf[64];
-                sprintf(buf, "    MISMATCH @ byte[%u]: Wrote=0x%02X Read=0x%02X",
-                        i, g_testData[i], verifyBuf[i]);
-                UART_Println(buf);
-            }
-        }
-        LCD_ShowVerifyResult(0);
-        UART_PrintSep();
-        return 1;
-    }
-}
-
-/**
- * @brief  KEY2: 读取数据并与原始数据比对
- * @retval 0=一致, 1=不一致
- */
-static uint8_t W25Q128_DoReadVerify(void)
-{
-    if (xW25Q128.FlagInit == 0)
-    {
-        UART_Println("[READ] ERROR: W25Q128 not init!");
-        return 1;
-    }
-
-    /* ---- 串口打印读取信息 ---- */
-    UART_PrintSep();
-    UART_Println(">>> [KEY2] READ + VERIFY Operation <<<");
-    {
-        char buf[48];
-        sprintf(buf, "    Address     : 0x%08lX", (unsigned long)TEST_ADDR);
-        UART_Println(buf);
-        sprintf(buf, "    Length      : %u bytes", (unsigned int)TEST_DATA_LEN);
-        UART_Println(buf);
-    }
-    UART_PrintHex("    Expected    : ", g_testData, TEST_DATA_LEN);
-    UART_Println("    Expected(PY): 2023014085 JinChengHao");
-
-    /* ---- 执行读取 ---- */
-    memset(g_readBuf, 0, TEST_DATA_LEN);
-    W25Q128_ReadData(TEST_ADDR, g_readBuf, TEST_DATA_LEN);
-
-    UART_PrintHex("    Read Data   : ", g_readBuf, TEST_DATA_LEN);
-    UART_Println("    Read Str(PY): 2023014085 JinChengHao");
-
-    /* ---- LCD 显示读出的数据 ---- */
-    LCD_ShowOpData("READ", CYAN);
-
-    /* ---- 比对 ---- */
-    if (memcmp(g_testData, g_readBuf, TEST_DATA_LEN) == 0)
-    {
-        UART_Println("    [VERIFY] PASSED! Data matches.");
-        LCD_ShowVerifyResult(1);
-        UART_PrintSep();
-        return 0;
-    }
-    else
-    {
-        UART_Println("    [VERIFY] FAILED! Data mismatch.");
-        for (uint16_t i = 0; i < TEST_DATA_LEN; i++)
-        {
-            if (g_testData[i] != g_readBuf[i])
-            {
-                char buf[64];
-                sprintf(buf, "    MISMATCH @ byte[%u]: Exp=0x%02X Got=0x%02X",
-                        i, g_testData[i], g_readBuf[i]);
-                UART_Println(buf);
-            }
-        }
-        LCD_ShowVerifyResult(0);
-        UART_PrintSep();
-        return 1;
-    }
+    UART_Println("Save to W25Q128 FAILED!");
+    return 1;
 }
 
 /*===========================================================================
@@ -316,66 +316,90 @@ static void SystemClock_Config(void);
 int main(void)
 {
     uint8_t keyVal;
-    uint8_t result;
 
     /* ---- 硬件初始化 ---- */
     HAL_Init();
     SystemClock_Config();
 
-    /* ---- UART1 初始化 (115200bps, PA9/PA10) ---- */
+    /* ---- UART1 ---- */
     UART1_Init();
     UART_PrintSep();
-    UART_Println("=== W25Q128 R/W Test Start ===");
-    UART_Println("MCU : STM32F407VET6 @ 16MHz HSI");
-    UART_Println("LCD : ILI9341 240x320 (FSMC)");
-    UART_Println("SPI : PA5=SCK PA6=MISO PA7=MOSI PC13=CS");
-    UART_Println("UART: PA9=TX PA10=RX 115200-8-N-1");
+    UART_Println("=== ADC1 Timer-Triggered Sampling ===");
+    UART_Println("ADC1: PA2 (IN2)  0~3V  10Hz Sine");
+    UART_Println("TIM3: TRGO 10ms  -> 256 samples");
+    UART_Println("Store: W25Q128 @ 0x2000");
     UART_PrintSep();
 
-    /* ---- LCD 初始化 ---- */
+    /* ---- LCD ---- */
     LCD_Init();
     LCD_DrawUI();
     UART_Println("LCD Init OK");
 
-    /* ---- 按键初始化 ---- */
+    /* ---- 按键 ---- */
     key_init();
-    UART_Println("KEY Init OK (KEY1=PA0 KEY2=PA1)");
+    UART_Println("KEY1=PA0  (Start Sampling)");
 
-    /* ---- W25Q128 初始化 ---- */
+    /* ---- W25Q128 ---- */
     uint8_t w25q_ok = W25Q128_Init();
-
     if (w25q_ok)
     {
-        char buf[48];
-        sprintf(buf, "W25Q128 Init OK [%s]", xW25Q128.type);
+        char buf[40];
+        sprintf(buf, "W25Q128 OK [%s]", xW25Q128.type);
         UART_Println(buf);
-        if (xW25Q128.FlagGBKStorage)
-        {
-            UART_Println("GBK Font Storage: Detected");
-        }
-        LCD_String(5, 222, buf, 12, GREEN, BLACK);
+        LCD_String(5, 170, buf, 12, GREEN, BLACK);
     }
     else
     {
-        UART_Println("W25Q128 Init FAILED! Check wiring.");
-        LCD_String(5, 222, (char *)"W25Q128 Init FAIL!", 12, RED, BLACK);
+        UART_Println("W25Q128 FAIL!");
+        LCD_String(5, 170, (char *)"W25Q128 FAIL!", 12, RED, BLACK);
     }
+
+    /* ---- ADC1 初始化 ---- */
+    ADC1_PA2_Init();
+    UART_Println("ADC1 Init OK (PA2)");
     UART_PrintSep();
 
     /* ---- 主循环 ---- */
     while (1)
     {
-        keyVal = key_scan(0);   /* 单次触发, 不支持连按 */
+        keyVal = key_scan(0);
 
-        if (keyVal == KEY1_PRES)
+        if (keyVal == KEY1_PRES && !g_sampling)
         {
-            result = W25Q128_DoWrite();
-            g_lastOp = (result == 0) ? OP_WRITE_OK : OP_WRITE_FAIL;
-        }
-        else if (keyVal == KEY2_PRES)
-        {
-            result = W25Q128_DoReadVerify();
-            g_lastOp = (result == 0) ? OP_READ_OK : OP_READ_FAIL;
+            /* ====== KEY1: 启动采样 ====== */
+            UART_PrintSep();
+            UART_Println(">>> KEY1: Start Sampling 256 pts <<<");
+
+            ADC1_StartSampling();
+            LCD_ShowStatus("Sampling started...", YELLOW);
+
+            /* 等待采样完成 (ADC 中断自动采集) */
+            uint16_t lastIdx = 0;
+            while (!g_adcDone)
+            {
+                if (g_adcIdx != lastIdx)
+                {
+                    lastIdx = g_adcIdx;
+                    LCD_ShowProgress(lastIdx);
+                }
+                HAL_Delay(5);
+            }
+
+            /* ---- LCD 绘制波形 (常驻, 不跳出) ---- */
+            LCD_DrawWaveform();
+
+            /* 保存到 W25Q128 (后台进行, 不覆盖波形) */
+            uint8_t saveOk = SaveToW25Q128();
+
+            if (saveOk == 0)
+            {
+                UART_Println("[OK] Saved to W25Q128 @ 0x2000");
+            }
+            else
+            {
+                UART_Println("[FAIL] W25Q128 write error!");
+            }
+            UART_PrintSep();
         }
 
         HAL_Delay(20);
@@ -383,7 +407,7 @@ int main(void)
 }
 
 /*===========================================================================
- * 系统时钟配置: HSI 16MHz, 无 PLL
+ * 系统时钟: HSI 16MHz
  *===========================================================================*/
 static void SystemClock_Config(void)
 {
@@ -415,15 +439,10 @@ static void SystemClock_Config(void)
     }
 }
 
-/*===========================================================================
- * 错误处理
- *===========================================================================*/
 void Error_Handler(void)
 {
     __disable_irq();
-    while (1)
-    {
-    }
+    while (1) {}
 }
 
 #ifdef USE_FULL_ASSERT

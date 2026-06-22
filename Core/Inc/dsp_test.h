@@ -18,7 +18,7 @@
 
 #include <stdint.h>
 
-#define DSP_SEQ_LEN  256
+#define DSP_SEQ_LEN  1024
 
 /* е§ЯвађСа (float) */
 extern float g_sinSeq[DSP_SEQ_LEN];

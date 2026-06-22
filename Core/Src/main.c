@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************************
  * @file        main.c
- * @brief       DAC三角波发生 + ADC定时采样 + DSP统计分析 + LCD波形显示
+ * @brief       DAC三角波发生 + ADC定时采样 + DSP统计分析 + FFT频谱 + LCD显示
  *
  *              硬件: STM32F407VET6 + ILI9341 2.8寸 LCD (FSMC, 240×320, RGB565)
  *                    PA4 (DAC_OUT1) → 跳线 → PA2 (ADC1_IN2)
@@ -9,11 +9,10 @@
  *
  *              功能:
  *              - PA4 产生 0~3V 100Hz 三角波 (TIM6触发DAC, DMA循环)
- *              - TIM2 100μs 定时触发 ADC1 采样 PA2 (256点/批)
- *              - 采集完256点自动停止, LCD 绘制波形
- *              - 用 arm_max_f32 / arm_min_f32 / arm_mean_f32 / arm_rms_f32 计算统计量
- *              - LCD 显示 Vmax / Vmin / Vavg / Vrms
- *              - 自动循环: 显示 → 2s延时 → 重新采集
+ *              - TIM2 156.25μs 定时触发 ADC1 采样 PA2 (1024点/批, 6400Hz)
+ *              - 采集完1024点自动停止, LCD 绘制波形 + 统计量
+ *              - CMSIS-DSP 实时 RFFT 256点频谱分析 (去直流+归一化)
+ *              - 串口输出 FFT 归一化幅度谱 (SerialPlot)
  *
  *              系统时钟: 16MHz HSI
  *
@@ -32,19 +31,18 @@
 /*===========================================================================
  * 常量定义
  *===========================================================================*/
-#define TRI_POINTS      256U    /* 三角波表点数                    */
-#define ADC_COUNT       256U    /* 每批 ADC 采样点数               */
+#define TRI_POINTS      1024U   /* 三角波表点数                    */
+#define ADC_COUNT       1024U   /* 每批 ADC 采样点数               */
 #define DAC_VMAX        3723U   /* 3.0V / 3.3V * 4095 ≈ 3723      */
 #define DAC_VREF        3.3f    /* DAC 参考电压                     */
 
-/* TIM6: 16MHz / (PSC+1) / (ARR+1) = 16M / 1 / 625 = 25600Hz      */
-/* 三角波频率 = 25600 / 256 = 100Hz                                */
+/* TIM6: 16M/156 ≈ 102564Hz, 三角波 = 102564/1024 ≈ 100.16Hz      */
 #define TIM6_PSC        0U
-#define TIM6_ARR        624U
+#define TIM6_ARR        155U
 
-/* TIM2: 16MHz / (PSC+1) / (ARR+1) = 16M / 16 / 100 = 10kHz       */
-/* ADC 采样间隔 = 100μs                                            */
-#define TIM2_PSC        15U
+/* TIM2: 16M / 25 / 100 = 6400Hz,  Δf=6400/1024=6.25Hz            */
+/* 100Hz → bin16 (精确整周期对齐, 零泄漏)                         */
+#define TIM2_PSC        24U
 #define TIM2_ARR        99U
 
 /* ---- LCD 颜色 ---- */
@@ -55,6 +53,10 @@
 #define GREEN   0x07E0
 #define RED     0xF800
 #define BLUE2   0x051F
+
+/* ---- FFT ---- */
+#define FFT_SIZE        256U            /* FFT 点数 (与 ADC_COUNT 一致) */
+#define FFT_MAG_BINS    (FFT_SIZE / 2U) /* 幅度谱有效 bin 数 = 128     */
 
 /*===========================================================================
  * 三角波查找表 (RAM, DMA 循环使用)
@@ -78,6 +80,14 @@ static DMA_HandleTypeDef  hdma_dac1;
 
 /* hadc1 给 adc.c 的 ISR 使用 (必须保留) */
 ADC_HandleTypeDef hadc1 = {0};
+
+/* ---- FFT 实例与缓冲区 ---- */
+static arm_rfft_fast_instance_f32 g_fftInst;
+static float32_t g_fftIn[FFT_SIZE];              /* RFFT 输入 (去直流后)     */
+static float32_t g_fftOut[FFT_SIZE];             /* RFFT 输出 (打包复数)     */
+static float32_t g_fftMag[FFT_SIZE];             /* 幅度谱 (归一化, 后半补0) */
+static float32_t g_fftMaxVal = 0.0f;             /* FFT 幅度最大值 (排除DC)  */
+static uint16_t  g_fftMaxBin = 0;                /* 最大值所在 bin */
 
 /*===========================================================================
  * 三角波表生成 (运行时, 填充到 RAM 数组)
@@ -243,18 +253,80 @@ static void ADC_Stop(void)
 }
 
 /*===========================================================================
- * 串口发送波形数据 (纯ADC值, 每行一个, 供 SerialPlot 显示)
- * 格式: ADC值\n   (仅换行符, 无回车)
- * SerialPlot: Baud=115200, ASCII, uint16, 分隔符=Newline, 通道数=1
+ * FFT 频谱计算 (CMSIS-DSP RFFT 256点)
+ * - 去直流 (arm_mean_f32)
+ * - 单边幅度谱归一化: DC/Nyquist /N, 其余 ×2/N
+ * - 查找基频峰值 (排除 DC)
+ *===========================================================================*/
+static void ComputeFFT(void)
+{
+    uint16_t i;
+    float32_t mean;
+
+    /* ---- 1. uint16 ADC → float32 ---- */
+    for (i = 0; i < FFT_SIZE; i++)
+    {
+        g_fftIn[i] = (float32_t)g_adcBuf[i];
+    }
+
+    /* ---- 2. 去直流 ---- */
+    arm_mean_f32(g_fftIn, FFT_SIZE, &mean);
+    for (i = 0; i < FFT_SIZE; i++)
+    {
+        g_fftIn[i] -= mean;
+    }
+
+    /* ---- 3. RFFT ---- */
+    arm_rfft_fast_f32(&g_fftInst, g_fftIn, g_fftOut, 0);
+
+    /* ---- 4. 单边归一化幅度谱 ---- */
+    /* DC (bin 0): 不乘2 */
+    g_fftMag[0] = fabsf(g_fftOut[0]) / (float32_t)FFT_SIZE;
+
+    /* Nyquist (bin N/2): 不乘2 */
+    g_fftMag[FFT_MAG_BINS] = fabsf(g_fftOut[1]) / (float32_t)FFT_SIZE;
+
+    /* bin 1 ~ N/2-1: ×2/N */
+    for (i = 1; i < FFT_MAG_BINS; i++)
+    {
+        float32_t re = g_fftOut[2 * i];
+        float32_t im = g_fftOut[2 * i + 1];
+        g_fftMag[i] = 2.0f * sqrtf(re * re + im * im) / (float32_t)FFT_SIZE;
+    }
+
+    /* ---- 5. 查找基频峰值 (排除 DC bin 0) ---- */
+    g_fftMaxVal = 0.0f;
+    g_fftMaxBin = 0;
+    for (i = 1; i <= FFT_MAG_BINS; i++)
+    {
+        if (g_fftMag[i] > g_fftMaxVal)
+        {
+            g_fftMaxVal = g_fftMag[i];
+            g_fftMaxBin = i;
+        }
+    }
+
+    /* ---- 6. 后半段补零 (对齐256点) ---- */
+    for (i = FFT_MAG_BINS + 1; i < FFT_SIZE; i++)
+    {
+        g_fftMag[i] = 0.0f;
+    }
+}
+
+/*===========================================================================
+ * 串口发送 FFT 幅度谱 (129点有效bin, 离散谱线)
+ * 只发有效频率 bin (0~128), 不补零
+ * SerialPlot: Baud=115200, ASCII, uint16, 通道数=1
  *===========================================================================*/
 static void SendToSerialPlot(void)
 {
     uint16_t i;
-    char buf[12];
+    char buf[16];
 
-    for (i = 0; i < ADC_COUNT; i++)
+    /* 只发送前 129 个有效 bin (DC + bin1~127 + Nyquist) */
+    for (i = 0; i <= FFT_MAG_BINS; i++)
     {
-        int len = sprintf(buf, "%u\n", g_adcBuf[i]);
+        int len = sprintf(buf, "%d\n", (int)g_fftMag[i]);
         UART1_SendString(buf);
         (void)len;
     }
@@ -290,6 +362,15 @@ void ADC1_ConvCpltCallback(uint16_t val)
 static void LCD_DrawWaveform(void)
 {
     uint16_t i;
+    uint32_t sum = 0;
+    uint16_t mean;
+
+    /* 计算 ADC 平均值 (直流偏置) */
+    for (i = 0; i < ADC_COUNT; i++)
+    {
+        sum += g_adcBuf[i];
+    }
+    mean = (uint16_t)(sum / ADC_COUNT);
 
     /* 清波形区域 */
     LCD_Fill(0, WAV_Y0 - 2, LCD_WIDTH - 1, LED_HEIGHT - 1, BLACK);
@@ -298,7 +379,7 @@ static void LCD_DrawWaveform(void)
     LCD_Fill(WAV_X0 - 1, WAV_Y0 - 1, WAV_X1 + 1, WAV_Y1 + 1, 0x18E3);
     LCD_Fill(WAV_X0, WAV_Y0, WAV_X1, WAV_Y1, BLACK);
 
-    /* 参考线: 3.0V(顶), 1.5V(中), 0V(底) */
+    /* 参考线: +Vpp/2(顶), 0V AC(中), -Vpp/2(底) */
     uint16_t yTop = WAV_Y0;
     uint16_t yMid = WAV_Y0 + WAV_H / 2;
     uint16_t yBot = WAV_Y1;
@@ -307,20 +388,31 @@ static void LCD_DrawWaveform(void)
     LCD_Line(WAV_X0, yMid, WAV_X1, yMid, 0x3186);
     LCD_Line(WAV_X0, yBot, WAV_X1, yBot, 0x39E7);
 
-    /* 电压标注 */
-    LCD_String(WAV_X1 + 4, yTop - 4, (char *)"3.0V", 12, 0x8410, BLACK);
-    LCD_String(WAV_X1 + 4, yMid - 4, (char *)"1.5V", 12, 0x8410, BLACK);
-    LCD_String(WAV_X1 + 4, yBot - 6, (char *)"0.0V", 12, 0x8410, BLACK);
+    /* 电压标注 (AC 耦合) */
+    LCD_String(WAV_X1 + 4, yTop - 4, (char *)"+1.5V", 12, 0x8410, BLACK);
+    LCD_String(WAV_X1 + 4, yMid - 5, (char *)" 0V AC", 12, 0x8410, BLACK);
+    LCD_String(WAV_X1 + 4, yBot - 6, (char *)"-1.5V", 12, 0x8410, BLACK);
 
-    /* 绘制波形 (256点折线) */
+    /* FFT 最大值标注 */
+    {
+        char fbuf[36];
+        float fftFreq = (float)g_fftMaxBin * 6400.0f / (float)FFT_SIZE;
+        sprintf(fbuf, "FFTmax:%.0f@bin%u(%.0fHz)", (double)g_fftMaxVal,
+                g_fftMaxBin, (double)fftFreq);
+        LCD_String(WAV_X0 + 2, yBot + 2, fbuf, 12, WHITE, BLACK);
+    }
+
+    /* 绘制波形 (去直流, 1024点折线) */
     for (i = 1; i < ADC_COUNT; i++)
     {
         uint16_t x0 = WAV_X0 + (uint32_t)(i - 1) * WAV_W / (ADC_COUNT - 1);
         uint16_t x1 = WAV_X0 + (uint32_t)i       * WAV_W / (ADC_COUNT - 1);
 
-        /* ADC值 → Y坐标 (0V=底部) */
-        uint16_t y0 = WAV_Y1 - (uint32_t)g_adcBuf[i - 1] * WAV_H / 4095U;
-        uint16_t y1 = WAV_Y1 - (uint32_t)g_adcBuf[i]     * WAV_H / 4095U;
+        /* 去直流: 以均值为中心, ±半幅度映射到 ±WAV_H/2 */
+        int32_t v0 = (int32_t)g_adcBuf[i - 1] - (int32_t)mean;
+        int32_t v1 = (int32_t)g_adcBuf[i]     - (int32_t)mean;
+        uint16_t y0 = (uint16_t)(yMid - v0 * (int32_t)(WAV_H / 2) / 2047);
+        uint16_t y1 = (uint16_t)(yMid - v1 * (int32_t)(WAV_H / 2) / 2047);
 
         if (y0 < WAV_Y0) y0 = WAV_Y0;
         if (y1 < WAV_Y0) y1 = WAV_Y0;
@@ -364,7 +456,7 @@ static void LCD_ShowStats(void)
 
     /* ---- LCD 顶部状态栏 ---- */
     LCD_Fill(0, 0, LCD_WIDTH - 1, 28, 0x2104);
-    LCD_String(8, 4, (char *)"DAC Tri 100Hz + ADC 100us", 16, WHITE, 0x2104);
+    LCD_String(8, 4, (char *)"DAC 100Hz + ADC 6400Hz 1024pt", 16, WHITE, 0x2104);
     LCD_Fill(0, 28, LCD_WIDTH - 1, 30, GREEN);
 
     /* ---- 电压统计 (DSP库) ---- */
@@ -434,6 +526,9 @@ int main(void)
     /* ---- 初始化 ADC 采样 (PA2) ---- */
     ADC_Sample_Init();
 
+    /* ---- 初始化 FFT (256点 RFFT) ---- */
+    arm_rfft_fast_init_f32(&g_fftInst, FFT_SIZE);
+
     /* ---- 主循环: 采集→显示→等待→重复 ---- */
     uint32_t batchNum = 0;
     for (;;)
@@ -451,17 +546,20 @@ int main(void)
             {
                 lastIdx = g_adcIdx;
                 char buf[24];
-                sprintf(buf, "Sampling %3u / %u", lastIdx, ADC_COUNT);
+                sprintf(buf, "Sampling %4u / %u", lastIdx, ADC_COUNT);
                 LCD_Fill(100, 164, 230, 178, BLACK);
                 LCD_String(100, 164, buf, 12, YELLOW, BLACK);
             }
             HAL_Delay(1);
         }
 
-        /* 绘制波形 */
+        /* 先计算 FFT (必须在 LCD 显示之前) */
+        ComputeFFT();
+
+        /* 绘制波形 + FFT max 标注 */
         LCD_DrawWaveform();
 
-        /* 发送纯 ADC 数据到串口示波器 */
+        /* 发送 FFT 频谱到串口 */
         SendToSerialPlot();
 
         /* 计算并显示统计量 */
@@ -474,9 +572,9 @@ int main(void)
             LCD_String(8, 152, buf, 12, CYAN, BLACK);
         }
 
-        /* 延时 2s 或按键触发重采 */
+        /* 短延时后自动重采 (总周期约 ~400ms/帧) */
         uint32_t wait = 0;
-        while (wait < 200)
+        while (wait < 30)
         {
             if (key_scan(0) == KEY1_PRES) break;
             HAL_Delay(10);

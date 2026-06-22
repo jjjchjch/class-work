@@ -9,9 +9,9 @@
  *
  *              功能:
  *              - PA4 产生 0~3V 100Hz 三角波 (TIM6触发DAC, DMA循环)
- *              - TIM2 156.25μs 定时触发 ADC1 采样 PA2 (1024点/批, 6400Hz)
+ *              - TIM2 100μs 定时触发 ADC1 采样 PA2 (1024点/批, 10kHz)
  *              - 采集完1024点自动停止, LCD 绘制波形 + 统计量
- *              - CMSIS-DSP 实时 RFFT 256点频谱分析 (去直流+归一化)
+ *              - CMSIS-DSP 实时 RFFT 1024点频谱分析 (去直流+归一化)
  *              - 串口输出 FFT 归一化幅度谱 (SerialPlot)
  *
  *              系统时钟: 16MHz HSI
@@ -40,10 +40,11 @@
 #define TIM6_PSC        0U
 #define TIM6_ARR        155U
 
-/* TIM2: 16M / 25 / 100 = 6400Hz,  Δf=6400/1024=6.25Hz            */
-/* 100Hz → bin16 (精确整周期对齐, 零泄漏)                         */
-#define TIM2_PSC        24U
-#define TIM2_ARR        99U
+/* TIM2: 100μs 定时触发 ADC, 采样率 = 10kHz                        */
+/* 16MHz / 16 / 100 = 10kHz                                        */
+/* Δf = 10000/1024 ≈ 9.77Hz, 100Hz → bin10                        */
+#define TIM2_PSC        15U     /* 16MHz/(15+1) = 1MHz, 1μs/tick   */
+#define TIM2_ARR        99U     /* 1MHz/(99+1)   = 10kHz, 100μs    */
 
 /* ---- LCD 颜色 ---- */
 #define BLACK   0x0000
@@ -55,8 +56,9 @@
 #define BLUE2   0x051F
 
 /* ---- FFT ---- */
-#define FFT_SIZE        256U            /* FFT 点数 (与 ADC_COUNT 一致) */
-#define FFT_MAG_BINS    (FFT_SIZE / 2U) /* 幅度谱有效 bin 数 = 128     */
+#define FFT_SIZE        ADC_COUNT        /* FFT 点数 = 1024 (使用全部采样数据) */
+#define FFT_MAG_BINS    (FFT_SIZE / 2U)  /* 幅度谱有效 bin 数 = 512            */
+#define FFT_SEND_BINS   128U             /* 串口发送前128 bin (覆盖0~1250Hz)   */
 
 /*===========================================================================
  * 三角波查找表 (RAM, DMA 循环使用)
@@ -314,8 +316,7 @@ static void ComputeFFT(void)
 }
 
 /*===========================================================================
- * 串口发送 FFT 幅度谱 (129点有效bin, 离散谱线)
- * 只发有效频率 bin (0~128), 不补零
+ * 串口发送 FFT 幅度谱 (前128点有效bin, 覆盖 0~1250Hz @10kHz)
  * SerialPlot: Baud=115200, ASCII, uint16, 通道数=1
  *===========================================================================*/
 static void SendToSerialPlot(void)
@@ -323,8 +324,8 @@ static void SendToSerialPlot(void)
     uint16_t i;
     char buf[16];
 
-    /* 只发送前 129 个有效 bin (DC + bin1~127 + Nyquist) */
-    for (i = 0; i <= FFT_MAG_BINS; i++)
+    /* 发送前 128 个有效 bin (DC~bin127, 覆盖 0~1250Hz) */
+    for (i = 0; i < FFT_SEND_BINS; i++)
     {
         int len = sprintf(buf, "%d\n", (int)g_fftMag[i]);
         UART1_SendString(buf);
@@ -396,7 +397,7 @@ static void LCD_DrawWaveform(void)
     /* FFT 最大值标注 */
     {
         char fbuf[36];
-        float fftFreq = (float)g_fftMaxBin * 6400.0f / (float)FFT_SIZE;
+        float fftFreq = (float)g_fftMaxBin * 10000.0f / (float)FFT_SIZE;
         sprintf(fbuf, "FFTmax:%.0f@bin%u(%.0fHz)", (double)g_fftMaxVal,
                 g_fftMaxBin, (double)fftFreq);
         LCD_String(WAV_X0 + 2, yBot + 2, fbuf, 12, WHITE, BLACK);
@@ -535,7 +536,7 @@ int main(void)
     {
         batchNum++;
 
-        /* 开始采集 256 点 */
+        /* 开始采集 1024 点 */
         ADC_Start();
 
         /* 等待采集完成 */

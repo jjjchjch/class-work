@@ -6,6 +6,10 @@ set(MX_Defines_Syms
 	USE_HAL_DRIVER 
 	STM32F407xx
     $<$<CONFIG:Debug>:DEBUG>
+    ARM_MATH_CM4
+    ARM_DSP_CONFIG_TABLES
+    ARM_FAST_ALLOW_TABLES
+    ARM_TABLE_SIN_F32
 )
 
 # STM32CubeMX generated include paths
@@ -16,6 +20,8 @@ set(MX_Include_Dirs
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/Include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/PrivateInclude
 )
 
 # STM32CubeMX generated application sources
@@ -29,6 +35,7 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/adc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/dac.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/dma.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/dsp_test.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/stm32f4xx_it.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/stm32f4xx_hal_msp.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/sysmem.c
@@ -66,6 +73,29 @@ set(STM32_Drivers_Src
 
 # Drivers Midllewares
 
+# CMSIS-DSP Library (ÕÍ’˚“∆÷≤)
+set(CMSIS_DSP_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/BasicMathFunctions/BasicMathFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/FastMathFunctions/FastMathFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/StatisticsFunctions/StatisticsFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/ComplexMathFunctions/ComplexMathFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/ControllerFunctions/ControllerFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/FilteringFunctions/FilteringFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/MatrixFunctions/MatrixFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/TransformFunctions/TransformFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/SupportFunctions/SupportFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/SVMFunctions/SVMFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/BayesFunctions/BayesFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/DistanceFunctions/DistanceFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/InterpolationFunctions/InterpolationFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/QuaternionMathFunctions/QuaternionMathFunctions.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/DSP/Source/CommonTables/CommonTables.c
+)
+
+# Add CMSIS-DSP sources to the project
+add_library(CMSIS_DSP OBJECT ${CMSIS_DSP_SRC})
+target_include_directories(CMSIS_DSP PRIVATE ${MX_Include_Dirs})
+target_link_libraries(CMSIS_DSP PUBLIC stm32cubemx)
 
 
 # Link directories setup
@@ -75,6 +105,7 @@ set(MX_LINK_DIRS
 # Project static libraries
 set(MX_LINK_LIBS 
     STM32_Drivers
+    CMSIS_DSP
     ${TOOLCHAIN_LINK_LIBRARIES}
     
 )

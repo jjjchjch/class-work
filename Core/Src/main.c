@@ -24,6 +24,7 @@
 #include "bsp_LCD_ILI9341.h"
 #include "bsp_W25Q128.h"
 #include "oled_frames.h"
+#include "dsp_test.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -45,6 +46,7 @@ ADC_HandleTypeDef hadc1 = {0};
  *===========================================================================*/
 static uint8_t g_showMoonCat = 0;
 static uint8_t g_mcatFrame   = 0;
+static uint8_t g_dspMode     = 0;  /* 0=正常, 1=DSP测试模式 */
 
 /*===========================================================================
  * 串口辅助
@@ -112,10 +114,11 @@ static void LCD_DrawADCUI(void)
 {
     LCD_Fill(0, 0, LCD_WIDTH - 1, LED_HEIGHT - 1, BLACK);
     LCD_Fill(0, 0, LCD_WIDTH - 1, 32, 0x2104);
-    LCD_String(15, 5, (char *)"ADC + MoonCat", 16, WHITE, 0x2104);
+    LCD_String(15, 5, (char *)"ADC + MoonCat + DSP", 16, WHITE, 0x2104);
     LCD_Fill(0, 32, LCD_WIDTH - 1, 34, GREEN);
     LCD_String(5, 42, (char *)"KEY1:ADC Sample  256pts", 12, CYAN, BLACK);
     LCD_String(5, 58, (char *)"KEY2:YueXinMiao Dance", 12, CYAN, BLACK);
+    LCD_String(5, 74, (char *)"KEY3:DSP Sine/Cos Test", 12, CYAN, BLACK);
 }
 
 static void LCD_DrawMoonCatUI(void)
@@ -268,9 +271,9 @@ int main(void)
     /* UART */
     UART1_Init();
     UART_PrintSep();
-    UART_Println("=== YueXinMiao + ADC ===");
+    UART_Println("=== YueXinMiao + ADC + DSP ===");
     UART_Println("22 frames 128x64 -> ILI9341 2x");
-    UART_Println("KEY1:ADC  KEY2:MoonCat");
+    UART_Println("KEY1:ADC  KEY2:MoonCat  KEY3:DSP");
     UART_PrintSep();
 
     /* LCD */
@@ -295,6 +298,47 @@ int main(void)
     {
         keyVal = key_scan(0);
 
+        /* ================================================================
+         * DSP 测试模式
+         * ================================================================ */
+        if (g_dspMode)
+        {
+            /* KEY1: 发送正弦波形 */
+            if (keyVal == KEY1_PRES)
+            {
+                UART_PrintSep();
+                UART_Println(">>> Sending SIN Waveform <<<");
+                DSP_SendWaveform('S');
+                UART_Println("[OK] SIN Sent.");
+                UART_PrintSep();
+            }
+
+            /* KEY2: 发送余弦波形 */
+            if (keyVal == KEY2_PRES)
+            {
+                UART_PrintSep();
+                UART_Println(">>> Sending COS Waveform <<<");
+                DSP_SendWaveform('C');
+                UART_Println("[OK] COS Sent.");
+                UART_PrintSep();
+            }
+
+            /* KEY3: 退出 DSP 模式 */
+            if (keyVal == KEY3_PRES)
+            {
+                g_dspMode = 0;
+                UART_Println("<<< Exit DSP Mode <<<");
+                LCD_DrawADCUI();
+            }
+
+            HAL_Delay(20);
+            continue;
+        }
+
+        /* ================================================================
+         * 正常模式
+         * ================================================================ */
+
         /* KEY2: 切换月薪喵模式 */
         if (keyVal == KEY2_PRES)
         {
@@ -307,6 +351,51 @@ int main(void)
                 UART_Println(">>> ADC Mode <<<");
                 LCD_DrawADCUI();
             }
+        }
+
+        /* KEY3: 进入 DSP 测试模式 */
+        if (keyVal == KEY3_PRES && !g_sampling)
+        {
+            if (g_showMoonCat) {
+                g_showMoonCat = 0;
+            }
+
+            UART_PrintSep();
+            UART_Println(">>> DSP Sine/Cosine Test <<<");
+            UART_Println("Generating 256-pt sequences...");
+
+            /* 生成正余弦序列 */
+            DSP_GenerateSequences();
+            UART_Println("Sequences generated.");
+
+            /* 计算统计量 */
+            DSP_ComputeStatistics();
+            UART_Println("Statistics computed.");
+
+            /* LCD 显示结果 */
+            DSP_DisplayResults();
+
+            /* 通过串口打印统计结果 */
+            {
+                char buf[80];
+                UART_PrintSep();
+                UART_Println("--- SINE Statistics ---");
+                sprintf(buf, "Max:  %+.4f", (double)g_sinMax);  UART_Println(buf);
+                sprintf(buf, "Min:  %+.4f", (double)g_sinMin);  UART_Println(buf);
+                sprintf(buf, "Mean: %+.4f", (double)g_sinMean); UART_Println(buf);
+                sprintf(buf, "RMS:   %.4f", (double)g_sinRMS);  UART_Println(buf);
+                UART_Println("--- COSINE Statistics ---");
+                sprintf(buf, "Max:  %+.4f", (double)g_cosMax);  UART_Println(buf);
+                sprintf(buf, "Min:  %+.4f", (double)g_cosMin);  UART_Println(buf);
+                sprintf(buf, "Mean: %+.4f", (double)g_cosMean); UART_Println(buf);
+                sprintf(buf, "RMS:   %.4f", (double)g_cosRMS);  UART_Println(buf);
+                UART_PrintSep();
+            }
+
+            UART_Println("KEY1:Send SIN  KEY2:Send COS  KEY3:Exit");
+            UART_PrintSep();
+
+            g_dspMode = 1;
         }
 
         /* KEY1: ADC 采样 */

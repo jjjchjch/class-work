@@ -47,141 +47,149 @@ cmake_ninja_workdir = D$:/CUBEproject/TEST11_new/build/Debug/
 #############################################
 # Order-only phony target for TEST11
 
-build cmake_object_order_depends_target_TEST11: phony || cmake_object_order_depends_target_STM32_Drivers
+build cmake_object_order_depends_target_TEST11: phony || cmake_object_order_depends_target_CMSIS_DSP cmake_object_order_depends_target_STM32_Drivers
 
 build CMakeFiles/TEST11.dir/Core/Src/main.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/main.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\main.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/timer.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/timer.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\timer.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/uart.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/uart.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\uart.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/gpio.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/gpio.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\gpio.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/key.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/key.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\key.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/encoder.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/encoder.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\encoder.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/adc.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/adc.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\adc.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/dac.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/dac.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\dac.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/dma.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/dma.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\dma.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = CMakeFiles\TEST11.dir
+  OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
+
+build CMakeFiles/TEST11.dir/Core/Src/dsp_test.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/dsp_test.c || cmake_object_order_depends_target_TEST11
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\dsp_test.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/stm32f4xx_it.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/stm32f4xx_it.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\stm32f4xx_it.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/stm32f4xx_hal_msp.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/stm32f4xx_hal_msp.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\stm32f4xx_hal_msp.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/sysmem.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/sysmem.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\sysmem.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/Src/syscalls.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/syscalls.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\syscalls.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/Core/LCD/bsp_LCD_ILI9341.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/LCD/bsp_LCD_ILI9341.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\LCD\bsp_LCD_ILI9341.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\LCD
 
 build CMakeFiles/TEST11.dir/Core/LCD/bsp_W25Q128.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/LCD/bsp_W25Q128.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\LCD\bsp_W25Q128.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\LCD
 
 build CMakeFiles/TEST11.dir/Core/Src/mooncat_anim.c.obj: C_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/mooncat_anim.c || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\Core\Src\mooncat_anim.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir\Core\Src
 
 build CMakeFiles/TEST11.dir/startup_stm32f407xx.s.obj: ASM_COMPILER__TEST11_unscanned_Debug D$:/CUBEproject/TEST11_new/startup_stm32f407xx.s || cmake_object_order_depends_target_TEST11
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = CMakeFiles\TEST11.dir\startup_stm32f407xx.s.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -x assembler-with-cpp -MMD -MP -g
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = CMakeFiles\TEST11.dir
   OBJECT_FILE_DIR = CMakeFiles\TEST11.dir
 
@@ -193,7 +201,7 @@ build CMakeFiles/TEST11.dir/startup_stm32f407xx.s.obj: ASM_COMPILER__TEST11_unsc
 #############################################
 # Link the executable TEST11.elf
 
-build TEST11.elf: C_EXECUTABLE_LINKER__TEST11_Debug cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f4xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac_ex.c.obj CMakeFiles/TEST11.dir/Core/Src/main.c.obj CMakeFiles/TEST11.dir/Core/Src/timer.c.obj CMakeFiles/TEST11.dir/Core/Src/uart.c.obj CMakeFiles/TEST11.dir/Core/Src/gpio.c.obj CMakeFiles/TEST11.dir/Core/Src/key.c.obj CMakeFiles/TEST11.dir/Core/Src/encoder.c.obj CMakeFiles/TEST11.dir/Core/Src/adc.c.obj CMakeFiles/TEST11.dir/Core/Src/dac.c.obj CMakeFiles/TEST11.dir/Core/Src/dma.c.obj CMakeFiles/TEST11.dir/Core/Src/stm32f4xx_it.c.obj CMakeFiles/TEST11.dir/Core/Src/stm32f4xx_hal_msp.c.obj CMakeFiles/TEST11.dir/Core/Src/sysmem.c.obj CMakeFiles/TEST11.dir/Core/Src/syscalls.c.obj CMakeFiles/TEST11.dir/Core/LCD/bsp_LCD_ILI9341.c.obj CMakeFiles/TEST11.dir/Core/LCD/bsp_W25Q128.c.obj CMakeFiles/TEST11.dir/Core/Src/mooncat_anim.c.obj CMakeFiles/TEST11.dir/startup_stm32f407xx.s.obj || cmake/stm32cubemx/STM32_Drivers
+build TEST11.elf: C_EXECUTABLE_LINKER__TEST11_Debug cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f4xx.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac.c.obj cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac_ex.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/BasicMathFunctions/BasicMathFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/FastMathFunctions/FastMathFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/StatisticsFunctions/StatisticsFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/ComplexMathFunctions/ComplexMathFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/ControllerFunctions/ControllerFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/FilteringFunctions/FilteringFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/MatrixFunctions/MatrixFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/TransformFunctions/TransformFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/SupportFunctions/SupportFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/SVMFunctions/SVMFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/BayesFunctions/BayesFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/DistanceFunctions/DistanceFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/InterpolationFunctions/InterpolationFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/QuaternionMathFunctions/QuaternionMathFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/CommonTables/CommonTables.c.obj CMakeFiles/TEST11.dir/Core/Src/main.c.obj CMakeFiles/TEST11.dir/Core/Src/timer.c.obj CMakeFiles/TEST11.dir/Core/Src/uart.c.obj CMakeFiles/TEST11.dir/Core/Src/gpio.c.obj CMakeFiles/TEST11.dir/Core/Src/key.c.obj CMakeFiles/TEST11.dir/Core/Src/encoder.c.obj CMakeFiles/TEST11.dir/Core/Src/adc.c.obj CMakeFiles/TEST11.dir/Core/Src/dac.c.obj CMakeFiles/TEST11.dir/Core/Src/dma.c.obj CMakeFiles/TEST11.dir/Core/Src/dsp_test.c.obj CMakeFiles/TEST11.dir/Core/Src/stm32f4xx_it.c.obj CMakeFiles/TEST11.dir/Core/Src/stm32f4xx_hal_msp.c.obj CMakeFiles/TEST11.dir/Core/Src/sysmem.c.obj CMakeFiles/TEST11.dir/Core/Src/syscalls.c.obj CMakeFiles/TEST11.dir/Core/LCD/bsp_LCD_ILI9341.c.obj CMakeFiles/TEST11.dir/Core/LCD/bsp_W25Q128.c.obj CMakeFiles/TEST11.dir/Core/Src/mooncat_anim.c.obj CMakeFiles/TEST11.dir/startup_stm32f407xx.s.obj || cmake/stm32cubemx/CMSIS_DSP cmake/stm32cubemx/STM32_Drivers
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3
   LINK_FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -T "D:/CUBEproject/TEST11_new/STM32F407XX_FLASH.ld" --specs=nano.specs -Wl,-Map=TEST11.map -Wl,--gc-sections -Wl,--print-memory-usage -u _printf_float
   LINK_LIBRARIES = -lm
@@ -233,6 +241,142 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 
 # =============================================================================
+# Object build statements for OBJECT_LIBRARY target CMSIS_DSP
+
+
+#############################################
+# Order-only phony target for CMSIS_DSP
+
+build cmake_object_order_depends_target_CMSIS_DSP: phony || .
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/BasicMathFunctions/BasicMathFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/BasicMathFunctions/BasicMathFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\BasicMathFunctions\BasicMathFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\BasicMathFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/FastMathFunctions/FastMathFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/FastMathFunctions/FastMathFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\FastMathFunctions\FastMathFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\FastMathFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/StatisticsFunctions/StatisticsFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/StatisticsFunctions/StatisticsFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\StatisticsFunctions\StatisticsFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\StatisticsFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/ComplexMathFunctions/ComplexMathFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/ComplexMathFunctions/ComplexMathFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\ComplexMathFunctions\ComplexMathFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\ComplexMathFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/ControllerFunctions/ControllerFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/ControllerFunctions/ControllerFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\ControllerFunctions\ControllerFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\ControllerFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/FilteringFunctions/FilteringFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/FilteringFunctions/FilteringFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\FilteringFunctions\FilteringFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\FilteringFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/MatrixFunctions/MatrixFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/MatrixFunctions/MatrixFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\MatrixFunctions\MatrixFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\MatrixFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/TransformFunctions/TransformFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/TransformFunctions/TransformFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\TransformFunctions\TransformFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\TransformFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/SupportFunctions/SupportFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/SupportFunctions/SupportFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\SupportFunctions\SupportFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\SupportFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/SVMFunctions/SVMFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/SVMFunctions/SVMFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\SVMFunctions\SVMFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\SVMFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/BayesFunctions/BayesFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/BayesFunctions/BayesFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\BayesFunctions\BayesFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\BayesFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/DistanceFunctions/DistanceFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/DistanceFunctions/DistanceFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\DistanceFunctions\DistanceFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\DistanceFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/InterpolationFunctions/InterpolationFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/InterpolationFunctions/InterpolationFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\InterpolationFunctions\InterpolationFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\InterpolationFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/QuaternionMathFunctions/QuaternionMathFunctions.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/QuaternionMathFunctions/QuaternionMathFunctions.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\QuaternionMathFunctions\QuaternionMathFunctions.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\QuaternionMathFunctions
+
+build cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/CommonTables/CommonTables.c.obj: C_COMPILER__CMSIS_DSP_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/CMSIS/DSP/Source/CommonTables/CommonTables.c || cmake_object_order_depends_target_CMSIS_DSP
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEP_FILE = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\CommonTables\CommonTables.c.obj.d
+  FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
+  OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir
+  OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\CMSIS_DSP.dir\__\__\Drivers\CMSIS\DSP\Source\CommonTables
+
+
+
+#############################################
+# Object library CMSIS_DSP
+
+build cmake/stm32cubemx/CMSIS_DSP: phony cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/BasicMathFunctions/BasicMathFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/FastMathFunctions/FastMathFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/StatisticsFunctions/StatisticsFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/ComplexMathFunctions/ComplexMathFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/ControllerFunctions/ControllerFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/FilteringFunctions/FilteringFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/MatrixFunctions/MatrixFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/TransformFunctions/TransformFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/SupportFunctions/SupportFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/SVMFunctions/SVMFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/BayesFunctions/BayesFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/DistanceFunctions/DistanceFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/InterpolationFunctions/InterpolationFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/QuaternionMathFunctions/QuaternionMathFunctions.c.obj cmake/stm32cubemx/CMakeFiles/CMSIS_DSP.dir/__/__/Drivers/CMSIS/DSP/Source/CommonTables/CommonTables.c.obj
+
+# =============================================================================
 # Object build statements for OBJECT_LIBRARY target STM32_Drivers
 
 
@@ -242,170 +386,170 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 build cmake_object_order_depends_target_STM32_Drivers: phony || .
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f4xx.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Core/Src/system_stm32f4xx.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Core\Src\system_stm32f4xx.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Core\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc_ex.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash_ex.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash_ramfunc.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_dma_ex.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_dma.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_pwr.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_pwr_ex.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_uart.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim_ex.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_exti.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_adc.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_adc_ex.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_dac.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
 build cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac_ex.c.obj: C_COMPILER__STM32_Drivers_unscanned_Debug D$:/CUBEproject/TEST11_new/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dac_ex.c || cmake_object_order_depends_target_STM32_Drivers
-  DEFINES = -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
+  DEFINES = -DARM_DSP_CONFIG_TABLES -DARM_FAST_ALLOW_TABLES -DARM_MATH_CM4 -DARM_TABLE_SIN_F32 -DDEBUG -DSTM32F407xx -DUSE_HAL_DRIVER
   DEP_FILE = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_dac_ex.c.obj.d
   FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -Wall -fdata-sections -ffunction-sections -fstack-usage -O0 -g3 -std=gnu11
-  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+  INCLUDES = -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Core/LCD -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/Include -ID:/CUBEproject/TEST11_new/cmake/stm32cubemx/../../Drivers/CMSIS/DSP/PrivateInclude
   OBJECT_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir
   OBJECT_FILE_DIR = cmake\stm32cubemx\CMakeFiles\STM32_Drivers.dir\__\__\Drivers\STM32F4xx_HAL_Driver\Src
 
@@ -443,6 +587,8 @@ build cmake/stm32cubemx/rebuild_cache: phony cmake/stm32cubemx/CMakeFiles/rebuil
 # =============================================================================
 # Target aliases.
 
+build CMSIS_DSP: phony cmake/stm32cubemx/CMSIS_DSP
+
 build STM32_Drivers: phony cmake/stm32cubemx/STM32_Drivers
 
 build TEST11: phony TEST11.elf
@@ -462,7 +608,7 @@ build all: phony TEST11.elf cmake/stm32cubemx/all
 #############################################
 # Folder: D:/CUBEproject/TEST11_new/build/Debug/cmake/stm32cubemx
 
-build cmake/stm32cubemx/all: phony cmake/stm32cubemx/STM32_Drivers
+build cmake/stm32cubemx/all: phony cmake/stm32cubemx/CMSIS_DSP cmake/stm32cubemx/STM32_Drivers
 
 # =============================================================================
 # Built-in targets

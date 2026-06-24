@@ -52,6 +52,8 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/LCD/bsp_LCD_ILI9341.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/LCD/bsp_W25Q128.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/mooncat_anim.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/myiic.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/bmp280.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../startup_stm32f407xx.s
 )
 

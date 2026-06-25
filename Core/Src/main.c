@@ -1,33 +1,21 @@
-/**
+Ôªø/**
  ****************************************************************************************************
  * @file        main.c
- * @brief       BMP280 À´÷·≤®–Œœ‘ æ (Œ¬∂»∫Ï…´ / ∆¯—π¬Ã…´)
- *
- *              LCD ≤ºæ÷ (240°¡320  ˙∆¡):
- *              ©∞©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©¥ y=0
- *              ©¶    BMP280 Œ¬∂»∆¯—π≤®–Œ     ©¶ ±ÍÃ‚¿∏ (¿∂µ◊)
- *              ©¿©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©» y=25
- *              ©¶ 50°Ê©§©»                    ©¶
- *              ©¶      ©¶    ≤®–Œ«¯”Ú        ©¶
- *              ©¶ 25°Ê©§©»   (∫Ï…´=Œ¬∂»)      ©¿©§105kPa
- *              ©¶      ©¶   (¬Ã…´=∆¯—π)      ©¶
- *              ©¶  0°Ê©§©»                    ©¿©§100kPa
- *              ©¿©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©» y=295
- *              ©¶ T:25.3°Ê  P:101.3kPa     ©¶  ˝÷µœ‘ æ
- *              ©∏©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©º y=319
+ * @brief       ESP8266 WiFi (STA Ê®°Âºè) ËøûÊé•ÊµãËØï
+ *              USART1 (PA9/PA10)   Ë∞ÉËØïËæìÂá∫ (115200)
+ *              USART3 (PB10/PB11)  ESP8266 ÈÄö‰ø°
  ****************************************************************************************************
  */
 
 #include "main.h"
 #include "uart.h"
 #include "delay.h"
-#include "key.h"
 #include "bsp_LCD_ILI9341.h"
-#include "bmp280.h"
+#include "esp8266.h"
 #include <stdio.h>
 #include <string.h>
 
-/* ---- —’…´ ---- */
+/* ---- È¢úËâ≤ ---- */
 #define BLACK   0x0000
 #define WHITE   0xFFFF
 #define BLUE    0x001F
@@ -35,32 +23,13 @@
 #define GREEN   0x07E0
 #define CYAN    0x7FFF
 #define YELLOW  0xFFE0
-#define DGRAY   0x39E7
 
-/* ---- ¥Æø⁄ª∫≥Â ---- */
-char g_uartBuf[128];
-
-/* ---- ≤®–Œª∫≥Â: 200µ„ª∑–Œ, ∂‘”¶ LCD ªÊÕºøÌ∂» ---- */
-#define BUF_SIZE  200
-static float g_tBuf[BUF_SIZE];
-static float g_pBuf[BUF_SIZE];
-static int   g_bufIdx = 0;
-static int   g_bufCnt = 0;
-
-/* ---- ◊¯±Í÷·∑∂Œß ---- */
-static float g_tMin = 0.0f,  g_tMax = 50.0f;
-static float g_pMin = 95.0f, g_pMax = 105.0f;
-
-/* ---- ªÊÕº«¯”Ú ---- */
-#define PLOT_X0   36
-#define PLOT_Y0   28
-#define PLOT_X1   200
-#define PLOT_Y1   288
-#define PLOT_W    (PLOT_X1 - PLOT_X0)
-#define PLOT_H    (PLOT_Y1 - PLOT_Y0)
+/* ---- ESP8266 WiFi ÈÖçÁΩÆ (STA Ê®°Âºè) ---- */
+#define WIFI_SSID     "jch"
+#define WIFI_PASSWORD "jchzcm123"
 
 /*===========================================================================
- * œµÕ≥ ±÷”: HSI 16MHz
+ * Á≥ªÁªüÊó∂Èíü: HSI 16MHz
  *===========================================================================*/
 static void SystemClock_Config(void)
 {
@@ -82,200 +51,69 @@ static void SystemClock_Config(void)
 }
 
 /*===========================================================================
- * ªÊ÷∆æ≤Ã¨◊¯±Íœµ
- *===========================================================================*/
-static void LCD_DrawAxes(void)
-{
-    int16_t i;
-    char buf[16];
-
-    /* ±ÍÃ‚¿∏ */
-    LCD_Fill(0, 0, 239, 24, BLUE);
-    LCD_String(50, 3, (char *)"BMP280 Wave", 16, WHITE, BLUE);
-
-    /* Õº±Ì«¯”Ú±≥æ∞ */
-    LCD_Fill(PLOT_X0 - 1, PLOT_Y0 - 1, PLOT_X1 + 1, PLOT_Y1 + 1, DGRAY);
-    LCD_Fill(PLOT_X0, PLOT_Y0, PLOT_X1, PLOT_Y1, BLACK);
-
-    /* ÀÆ∆ΩÕ¯∏Òœﬂ */
-    for (i = 0; i <= 4; i++)
-    {
-        int16_t y = PLOT_Y0 + (int16_t)((uint32_t)i * PLOT_H / 4);
-        LCD_Line(PLOT_X0, y, PLOT_X1, y, DGRAY);
-    }
-
-    /* ◊Û÷· (Œ¬∂», ∫Ï…´): ∫·≈≈±Í«© */
-    for (i = 0; i <= 4; i++)
-    {
-        int16_t y = PLOT_Y0 + (int16_t)((uint32_t)i * PLOT_H / 4);
-        float val = g_tMax - (g_tMax - g_tMin) * i / 4.0f;
-        sprintf(buf, "%.0f", (double)val);
-        LCD_String(2, y - 6, buf, 12, RED, BLACK);
-    }
-    LCD_String(4, PLOT_Y0 - 14, (char *)"T(C)", 12, RED, BLACK);
-
-    /* ”“÷· (∆¯—π, ¬Ã…´): ∫·≈≈±Í«©, ”Î◊Û÷·∂‘≥∆ */
-    for (i = 0; i <= 4; i++)
-    {
-        int16_t y = PLOT_Y0 + (int16_t)((uint32_t)i * PLOT_H / 4);
-        float val = g_pMax - (g_pMax - g_pMin) * i / 4.0f;
-        sprintf(buf, "%.1f", (double)val);
-        LCD_String(PLOT_X1 + 3, y - 6, buf, 12, GREEN, BLACK);
-    }
-    LCD_String(PLOT_X1 + 3, PLOT_Y0 - 14, (char *)"kPa", 12, GREEN, BLACK);
-
-    /* µ◊≤øÕº¿˝ */
-    LCD_Fill(0, PLOT_Y1 + 2, 239, 319, BLACK);
-    LCD_Fill(4, PLOT_Y1 + 8, 14, PLOT_Y1 + 12, RED);
-    LCD_String(18, PLOT_Y1 + 5, (char *)"Temp(C)", 12, WHITE, BLACK);
-    LCD_Fill(100, PLOT_Y1 + 8, 110, PLOT_Y1 + 12, GREEN);
-    LCD_String(114, PLOT_Y1 + 5, (char *)"Press(kPa)", 12, WHITE, BLACK);
-}
-
-/*===========================================================================
- * À¢–¬≤®–Œ: ≤¡æ…œﬂ, ª≠–¬œﬂ (À´…´)
- *===========================================================================*/
-static void LCD_DrawWave(void)
-{
-    int16_t i;
-    int16_t x0, y0_t, y0_p, x1, y1_t, y1_p;
-    int start, count;
-
-    if (g_bufCnt < 2) return;
-
-    count = (g_bufCnt < BUF_SIZE) ? g_bufCnt : BUF_SIZE;
-    start = (g_bufCnt < BUF_SIZE) ? 0 : g_bufIdx;
-
-    /* ≤¡≥˝…œ“ª÷° */
-    LCD_Fill(PLOT_X0, PLOT_Y0, PLOT_X1, PLOT_Y1, BLACK);
-
-    /* ÷ÿª≠Õ¯∏Ò */
-    for (i = 1; i <= 3; i++)
-    {
-        int16_t y = PLOT_Y0 + (int16_t)((uint32_t)i * PLOT_H / 4);
-        LCD_Line(PLOT_X0, y, PLOT_X1, y, DGRAY);
-    }
-
-    /* ª≠≤®–Œ’€œﬂ */
-    for (i = 1; i < count; i++)
-    {
-        int idx0 = (start + i - 1) % BUF_SIZE;
-        int idx1 = (start + i) % BUF_SIZE;
-
-        x0 = PLOT_X0 + (int16_t)((uint32_t)(i - 1) * PLOT_W / (count - 1));
-        x1 = PLOT_X0 + (int16_t)((uint32_t)i       * PLOT_W / (count - 1));
-
-        /* Œ¬∂» (∫Ï…´) */
-        y0_t = PLOT_Y0 + (int16_t)((double)(g_tMax - g_tBuf[idx0]) * PLOT_H / (g_tMax - g_tMin));
-        y1_t = PLOT_Y0 + (int16_t)((double)(g_tMax - g_tBuf[idx1]) * PLOT_H / (g_tMax - g_tMin));
-        if (y0_t < PLOT_Y0) y0_t = PLOT_Y0;
-        if (y1_t < PLOT_Y0) y1_t = PLOT_Y0;
-        if (y0_t > PLOT_Y1) y0_t = PLOT_Y1;
-        if (y1_t > PLOT_Y1) y1_t = PLOT_Y1;
-        LCD_Line(x0, y0_t, x1, y1_t, RED);
-
-        /* ∆¯—π (¬Ã…´) */
-        y0_p = PLOT_Y0 + (int16_t)((double)(g_pMax - g_pBuf[idx0]) * PLOT_H / (g_pMax - g_pMin));
-        y1_p = PLOT_Y0 + (int16_t)((double)(g_pMax - g_pBuf[idx1]) * PLOT_H / (g_pMax - g_pMin));
-        if (y0_p < PLOT_Y0) y0_p = PLOT_Y0;
-        if (y1_p < PLOT_Y0) y1_p = PLOT_Y0;
-        if (y0_p > PLOT_Y1) y0_p = PLOT_Y1;
-        if (y1_p > PLOT_Y1) y1_p = PLOT_Y1;
-        LCD_Line(x0, y0_p, x1, y1_p, GREEN);
-    }
-}
-
-/*===========================================================================
- * ∏¸–¬µ◊≤ø ˝÷µ
- *===========================================================================*/
-static void LCD_UpdateValues(float temp, float press)
-{
-    char buf[32];
-    LCD_Fill(0, PLOT_Y1 + 3, 239, 319, BLACK);
-
-    sprintf(buf, "T:%.1f C", (double)temp);
-    LCD_String(10, PLOT_Y1 + 6, buf, 16, RED, BLACK);
-
-    sprintf(buf, "P:%.2f kPa", (double)press);
-    LCD_String(120, PLOT_Y1 + 6, buf, 16, GREEN, BLACK);
-}
-
-/*===========================================================================
- * ÷˜∫Ø ˝
+ * ‰∏ªÁ®ãÂ∫è: ‰ªÖ ESP8266 WiFi ËøûÊé•ÊµãËØï
+ *         ÂàùÂßãÂåñ ‚Üí AT ‚Üí CWMODE=1 ‚Üí CWJAP ‚Üí CIFSR ‚Üí ‰∏ªÂæ™ÁéØ LED ÂøÉË∑≥
  *===========================================================================*/
 int main(void)
 {
-    uint16_t tick = 0;
-    float tVal, pVal;
-
     HAL_Init();
     SystemClock_Config();
 
-    /* ---- UART ---- */
+    /* ---- UART1 (Ë∞ÉËØïËæìÂá∫ 115200) ---- */
     UART1_Init();
-    UART1_SendString("\r\n=== BMP280 Wave ===\r\n");
-    UART1_SendString("CH1:Temp(C) CH2:Press(kPa)\r\n\r\n");
+    UART1_SendString("\r\n========== ESP8266 WiFi Test ==========\r\n");
 
-    /* ---- LED ---- */
+    /* ---- LED (PC5) ÂøÉË∑≥ ---- */
     __HAL_RCC_GPIOC_CLK_ENABLE();
     GPIO_InitTypeDef gpio = {0};
     gpio.Pin = GPIO_PIN_5;
     gpio.Mode = GPIO_MODE_OUTPUT_PP;
     HAL_GPIO_Init(GPIOC, &gpio);
 
-    /* ---- LCD ---- */
+    /* ---- LCD Áä∂ÊÄÅÊòæÁ§∫ ---- */
     LCD_Init();
     LCD_SetDir(0);
     LCD_Fill(0, 0, 240, 320, BLACK);
+    LCD_Fill(0, 0, 239, 24, BLUE);
+    LCD_String(30, 3, (char *)"ESP8266 WiFi Test", 16, WHITE, BLUE);
 
-    /* ---- BMP280 ---- */
-    Bmp280Init();
+    /* ---- ESP8266 WiFi (USART3, STA Ê®°Âºè) ---- */
+    UART3_Init();
+    LCD_String(4, 40, (char *)"WiFi: Connecting...", 16, YELLOW, BLACK);
 
-    /* ---- ª≠◊¯±Íœµ ---- */
-    LCD_DrawAxes();
+    if (ESP8266_Init())
+    {
+        UART1_SendString("[Main] ESP8266 Init OK, joining AP\r\n");
+        if (ESP8266_JoinAP(WIFI_SSID, WIFI_PASSWORD, 400))
+        {
+            UART1_SendString("[Main] JoinAP OK\r\n");
+            LCD_Fill(0, 40, 239, 56, BLACK);
+            LCD_String(4, 40, (char *)"WiFi: Connected", 16, GREEN, BLACK);
+            ESP8266_PrintIP();
+        }
+        else
+        {
+            UART1_SendString("[Main] JoinAP FAIL\r\n");
+            LCD_Fill(0, 40, 239, 56, BLACK);
+            LCD_String(4, 40, (char *)"WiFi: JoinAP FAIL", 16, RED, BLACK);
+        }
+    }
+    else
+    {
+        UART1_SendString("[Main] ESP8266 Init FAIL\r\n");
+        LCD_Fill(0, 40, 239, 56, BLACK);
+        LCD_String(4, 40, (char *)"WiFi: No ESP8266", 16, RED, BLACK);
+    }
 
-    /* ---- ÷˜—≠ª∑ ---- */
+    /* ---- ‰∏ªÂæ™ÁéØ: ‰ªÖ LED ÂøÉË∑≥, ‰∏çÂÜçÊúâÂÖ∂‰ªñËæìÂá∫Âπ≤Êâ∞ ---- */
     while (1)
     {
-        if (tick % 10 == 0)
-        {
-            bmp280_GetValue();
-            tVal = Bmp280Data.T;
-            pVal = Bmp280Data.P / 1000.0f;   /* Pa °˙ kPa */
-
-            /* ¥Ê≤®–Œ */
-            g_tBuf[g_bufIdx] = tVal;
-            g_pBuf[g_bufIdx] = pVal;
-            g_bufIdx = (g_bufIdx + 1) % BUF_SIZE;
-            if (g_bufCnt < BUF_SIZE) g_bufCnt++;
-
-            /* ∂ØÃ¨µ˜’˚ Y ÷·∑∂Œß */
-            if (tVal < g_tMin - 1.0f || tVal > g_tMax + 1.0f ||
-                pVal < g_pMin - 1.0f || pVal > g_pMax + 1.0f)
-            {
-                g_tMin = (float)((int)(tVal / 5.0f) * 5);
-                g_tMax = g_tMin + 50.0f;
-                g_pMin = (float)((int)(pVal - 3.0f));
-                g_pMax = g_pMin + 10.0f;
-                LCD_DrawAxes();
-            }
-
-            /* ¥Æø⁄ */
-            sprintf(g_uartBuf, "%.1f,%.3f\r\n", (double)tVal, (double)pVal);
-            UART1_SendString(g_uartBuf);
-
-            /* LCD ≤®–Œ +  ˝÷µ */
-            LCD_DrawWave();
-            LCD_UpdateValues(tVal, pVal);
-        }
-
-        delay_ms(10);
-        tick++;
-        if (tick == 20) { tick = 0; HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5); }
+        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5);
+        delay_ms(500);
     }
 }
 
-/* ◊Æ∫Ø ˝ */
+/* Ê°©ÂáΩÊï∞ */
 ADC_HandleTypeDef hadc1 = {0};
 void ADC1_ConvCpltCallback(uint16_t val) { (void)val; }
 void Error_Handler(void) { __disable_irq(); while (1) {} }

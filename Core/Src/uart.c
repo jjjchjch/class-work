@@ -7,6 +7,18 @@
 
 static UART_HandleTypeDef huart1;
 
+/* ================================================================
+ * USART3 (PB10 TX / PB11 RX) - ESP8266
+ * DMA1 Stream3 CH4 (TX), DMA1 Stream1 CH4 (RX), IDLE 空闲中断
+ * ================================================================ */
+UART_HandleTypeDef huart3;
+DMA_HandleTypeDef  hdma_usart3_tx;
+DMA_HandleTypeDef  hdma_usart3_rx;
+
+uint8_t  U3_TxBuff[U3_TX_SIZE];
+uint8_t  U3_RxBuff[U3_RX_SIZE];
+volatile uint16_t Rx3Counter = 0;
+
 void UART1_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -111,4 +123,144 @@ bool UART1_DMA_IsBusy(void)
 void USART1_IRQHandler(void)
 {
     HAL_UART_IRQHandler(&huart1);
+}
+
+/* ================================================================
+ * USART3 - ESP8266 通信 (DMA + IDLE)
+ * ================================================================ */
+
+/**
+ * @brief  初始化 USART3: PB10(TX) / PB11(RX), 115200, 8N1
+ *         同时配置 DMA1 Stream3(TX) / Stream1(RX), 并启动 IDLE 接收
+ */
+void UART3_Init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_USART3_CLK_ENABLE();
+    __HAL_RCC_DMA1_CLK_ENABLE();
+
+    /* PB10 (TX) / PB11 (RX) 复用 USART3 */
+    GPIO_InitStruct.Pin       = GPIO_PIN_10 | GPIO_PIN_11;
+    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull      = GPIO_PULLUP;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    huart3.Instance          = USART3;
+    huart3.Init.BaudRate     = 115200;
+    huart3.Init.WordLength   = UART_WORDLENGTH_8B;
+    huart3.Init.StopBits     = UART_STOPBITS_1;
+    huart3.Init.Parity       = UART_PARITY_NONE;
+    huart3.Init.Mode         = UART_MODE_TX_RX;
+    huart3.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
+    huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+    if (HAL_UART_Init(&huart3) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    /* TX DMA: DMA1 Stream3 Channel4 */
+    hdma_usart3_tx.Instance                 = DMA1_Stream3;
+    hdma_usart3_tx.Init.Channel             = DMA_CHANNEL_4;
+    hdma_usart3_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+    hdma_usart3_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_usart3_tx.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_usart3_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_usart3_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    hdma_usart3_tx.Init.Mode                = DMA_NORMAL;
+    hdma_usart3_tx.Init.Priority            = DMA_PRIORITY_MEDIUM;
+    hdma_usart3_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_usart3_tx) != HAL_OK) Error_Handler();
+    __HAL_LINKDMA(&huart3, hdmatx, hdma_usart3_tx);
+
+    /* RX DMA: DMA1 Stream1 Channel4 */
+    hdma_usart3_rx.Instance                 = DMA1_Stream1;
+    hdma_usart3_rx.Init.Channel             = DMA_CHANNEL_4;
+    hdma_usart3_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+    hdma_usart3_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_usart3_rx.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_usart3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_usart3_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    hdma_usart3_rx.Init.Mode                = DMA_NORMAL;
+    hdma_usart3_rx.Init.Priority            = DMA_PRIORITY_MEDIUM;
+    hdma_usart3_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_usart3_rx) != HAL_OK) Error_Handler();
+    __HAL_LINKDMA(&huart3, hdmarx, hdma_usart3_rx);
+
+    /* NVIC: USART3 + DMA TX + DMA RX */
+    HAL_NVIC_SetPriority(USART3_IRQn,           1, 0);
+    HAL_NVIC_EnableIRQ(USART3_IRQn);
+    HAL_NVIC_SetPriority(DMA1_Stream3_IRQn,     1, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+    HAL_NVIC_SetPriority(DMA1_Stream1_IRQn,     1, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
+
+    /* 启动 IDLE 接收 (DMA 收满一帧或总线空闲时触发回调) */
+    Rx3Counter = 0;
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart3, U3_RxBuff, U3_RX_SIZE);
+}
+
+/**
+ * @brief  USART3 阻塞式发送字符串
+ */
+void UART3_SendString(const char *text)
+{
+    if (text == NULL) return;
+    size_t len = strlen(text);
+    if (len == 0U) return;
+    HAL_UART_Transmit(&huart3, (uint8_t *)text, (uint16_t)len, 500U);
+}
+
+/**
+ * @brief  USART3 阻塞式发送原始数据
+ */
+void UART3_SendData(const uint8_t *data, uint16_t len)
+{
+    if (data == NULL || len == 0U) return;
+    HAL_UART_Transmit(&huart3, (uint8_t *)data, len, 500U);
+}
+
+/**
+ * @brief  USART3 全局中断 — HAL 处理 IDLE/TC/错误
+ */
+void USART3_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&huart3);
+}
+
+/**
+ * @brief  DMA1 Stream3 中断 (USART3 TX)
+ */
+void DMA1_Stream3_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&hdma_usart3_tx);
+}
+
+/**
+ * @brief  DMA1 Stream1 中断 (USART3 RX)
+ */
+void DMA1_Stream1_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&hdma_usart3_rx);
+}
+
+/**
+ * @brief  HAL 接收事件回调 (DMA 完成或 IDLE 触发)
+ *         在此处记录本次接收字节数, 并重启下一轮 DMA 接收
+ */
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+{
+    if (huart->Instance == USART3)
+    {
+        /* 仅在没处理完上一帧时才覆盖, 避免 ESP8266_SendAT 漏读 */
+        if (Rx3Counter == 0)
+        {
+            Rx3Counter = Size;
+        }
+        /* 重启下一轮 DMA 接收 */
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart3, U3_RxBuff, U3_RX_SIZE);
+    }
 }

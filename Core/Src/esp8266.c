@@ -136,14 +136,72 @@ void ESP8266_PrintIP(void)
     UART1_SendString("[ESP] Query IP (AT+CIFSR):\r\n");
     Rx3Counter = 0;
     memset(U3_RxBuff, 0, ESP8266_RX_BUF_SIZE);
+
+    UART1_SendString("\r\n[TX] AT+CIFSR\r\n");
     UART3_SendString("AT+CIFSR\r\n");
+
     delay_ms(500);
     if (Rx3Counter)
     {
+        UART1_SendString("[RX OK] ");
         UART1_SendString((char *)U3_RxBuff);
     }
     else
     {
-        UART1_SendString("(no response)\r\n");
+        UART1_SendString("[RX TIMEOUT] (no response)\r\n");
     }
+}
+
+/* ================================================================
+ * 启动 TCP 透传模式
+ * 顺序: CIPMUX=0 → CIPSTART → CIPMODE=1 → CIPSEND
+ * ================================================================ */
+uint8_t ESP8266_StartTransparent(char *serverIP, uint16_t port)
+{
+    char cmd[64];
+
+    UART1_SendString("\r\n======== Start Transparent ========\r\n");
+
+    /* Step 4: 单连接模式 */
+    UART1_SendString("[Step 4] AT+CIPMUX=0\r\n");
+    if (!ESP8266_SendAT("AT+CIPMUX=0\r\n", "OK", 50))
+    {
+        UART1_SendString("-----> Step4 FAIL\r\n");
+        return 0;
+    }
+    UART1_SendString("-----> Step4 OK\r\n");
+
+    /* Step 5: 建立 TCP 连接 */
+    UART1_SendString("[Step 5] AT+CIPSTART\r\n");
+    snprintf(cmd, sizeof(cmd), "AT+CIPSTART=\"TCP\",\"%s\",%d\r\n", serverIP, port);
+    if (!ESP8266_SendAT(cmd, "OK", 200))
+    {
+        UART1_SendString("-----> Step5 FAIL\r\n");
+        return 0;
+    }
+    UART1_SendString("-----> Step5 OK\r\n");
+
+    /* Step 6: 开启透传模式 */
+    UART1_SendString("[Step 6] AT+CIPMODE=1\r\n");
+    if (!ESP8266_SendAT("AT+CIPMODE=1\r\n", "OK", 50))
+    {
+        UART1_SendString("-----> Step6 FAIL\r\n");
+        return 0;
+    }
+    UART1_SendString("-----> Step6 OK\r\n");
+
+    /* Step 7: 进入透传发送 (期望 ">" 提示符) */
+    UART1_SendString("[Step 7] AT+CIPSEND\r\n");
+    if (!ESP8266_SendAT("AT+CIPSEND\r\n", ">", 50))
+    {
+        UART1_SendString("-----> Step7 FAIL\r\n");
+        return 0;
+    }
+    UART1_SendString("-----> Step7 OK\r\n");
+
+    UART1_SendString("======== Transparent Mode Active ========\r\n");
+    UART1_SendString("(此后所有 USART3 数据将直接透传到服务器)\r\n");
+    UART1_SendString("(发送 \"+++\" 可退出透传)\r\n");
+
+    return 1;
 }

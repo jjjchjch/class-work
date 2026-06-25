@@ -28,6 +28,10 @@
 #define WIFI_SSID     "jch"
 #define WIFI_PASSWORD "jchzcm123"
 
+/* ---- TCP 透传服务器配置 ---- */
+#define TCP_SERVER_IP   "192.168.15.20"
+#define TCP_SERVER_PORT 8080
+
 /*===========================================================================
  * 系统时钟: HSI 16MHz
  *===========================================================================*/
@@ -90,6 +94,18 @@ int main(void)
             LCD_Fill(0, 40, 239, 56, BLACK);
             LCD_String(4, 40, (char *)"WiFi: Connected", 16, GREEN, BLACK);
             ESP8266_PrintIP();
+
+            /* 启动 TCP 透传 */
+            if (ESP8266_StartTransparent(TCP_SERVER_IP, TCP_SERVER_PORT))
+            {
+                LCD_String(4, 64, (char *)"TCP: Transparent OK", 16, GREEN, BLACK);
+                UART1_SendString("[Main] Transparent mode active\r\n");
+            }
+            else
+            {
+                LCD_String(4, 64, (char *)"TCP: Transparent FAIL", 16, RED, BLACK);
+                UART1_SendString("[Main] Transparent mode FAIL\r\n");
+            }
         }
         else
         {

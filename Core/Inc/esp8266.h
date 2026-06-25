@@ -60,6 +60,17 @@ uint8_t ESP8266_JoinAP(char *SSID, char *passWord, uint32_t timeout);
  */
 void ESP8266_PrintIP(void);
 
+/**
+ * @brief  启动 TCP 透传模式
+ *         顺序: CIPMUX=0 → CIPSTART → CIPMODE=1 → CIPSEND
+ * @param  serverIP : 服务器 IP 地址 (如 "192.168.15.20")
+ * @param  port     : 服务器端口 (如 8080)
+ * @retval 1 透传启动成功, 0 失败
+ * @note   成功后所有 USART3 发送的数据将直接透传到服务器,
+ *         发送 "+++" (不带换行, 前后各留1秒) 可退出透传
+ */
+uint8_t ESP8266_StartTransparent(char *serverIP, uint16_t port);
+
 #ifdef __cplusplus
 }
 #endif

@@ -55,6 +55,7 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/myiic.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/bmp280.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/esp8266.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/bsp_AD9833.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../startup_stm32f407xx.s
 )
 

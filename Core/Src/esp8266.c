@@ -97,35 +97,25 @@ uint8_t ESP8266_Init(void)
 
 /* ================================================================
  * Step 3: 加入 AP (AT+CWJAP)
- *   AT+CWJAP="jch","jchzcm123"  -> 期望 "WIFI GOT IP" 或 "OK"
- * 回复同样通过 ESP8266_SendAT 打印到 USART1
+ *   必须等 "OK"，不等 "WIFI GOT IP"
+ *   WIFI GOT IP 后 ESP8266 可能还没完全空闲
  * ================================================================ */
 uint8_t ESP8266_JoinAP(char *SSID, char *passWord, uint32_t timeout)
 {
-    char cmd[96];
-    uint8_t ok = 0;
+    char cmd[128];
 
-    /* 拼接 AT+CWJAP="SSID","PASS" */
     snprintf(cmd, sizeof(cmd), "AT+CWJAP=\"%s\",\"%s\"\r\n", SSID, passWord);
 
     UART1_SendString("\r\n[Step 3] AT+CWJAP\r\n");
-    /* 先等 "WIFI GOT IP" 表示拿到 IP, 退而求其次等 "OK" */
-    if (ESP8266_SendAT(cmd, "WIFI GOT IP", timeout))
+    if (ESP8266_SendAT(cmd, "OK", timeout))
     {
-        UART1_SendString("-----> Step3 GOT IP\r\n");
-        ok = 1;
+        UART1_SendString("-----> Step3 OK\r\n");
+        /* 关键：等模块彻底空闲 */
+        delay_ms(3000);
+        return 1;
     }
-    else if (strstr((char *)U3_RxBuff, "OK") != NULL)
-    {
-        UART1_SendString("-----> Step3 OK (no GOT IP yet)\r\n");
-        ok = 1;
-    }
-    else
-    {
-        UART1_SendString("-----> Step3 FAIL\r\n");
-    }
-
-    return ok;
+    UART1_SendString("-----> Step3 FAIL\r\n");
+    return 0;
 }
 
 /* ================================================================
@@ -134,65 +124,97 @@ uint8_t ESP8266_JoinAP(char *SSID, char *passWord, uint32_t timeout)
 void ESP8266_PrintIP(void)
 {
     UART1_SendString("[ESP] Query IP (AT+CIFSR):\r\n");
-    Rx3Counter = 0;
-    memset(U3_RxBuff, 0, ESP8266_RX_BUF_SIZE);
-
-    UART1_SendString("\r\n[TX] AT+CIFSR\r\n");
-    UART3_SendString("AT+CIFSR\r\n");
-
-    delay_ms(500);
-    if (Rx3Counter)
+    if (ESP8266_SendAT("AT+CIFSR\r\n", "OK", 200))
     {
-        UART1_SendString("[RX OK] ");
-        UART1_SendString((char *)U3_RxBuff);
+        UART1_SendString("[ESP] CIFSR OK\r\n");
     }
     else
     {
-        UART1_SendString("[RX TIMEOUT] (no response)\r\n");
+        UART1_SendString("[ESP] CIFSR FAIL\r\n");
     }
+    delay_ms(1000);
 }
 
 /* ================================================================
  * 启动 TCP 透传模式
- * 顺序: CIPMUX=0 → CIPSTART → CIPMODE=1 → CIPSEND
+ * 顺序: 清理残留 → CIPMUX=0 → CIPSTART → CIPMODE=1 → CIPSEND
  * ================================================================ */
 uint8_t ESP8266_StartTransparent(char *serverIP, uint16_t port)
 {
-    char cmd[64];
+    char cmd[96];
+    uint8_t i;
 
     UART1_SendString("\r\n======== Start Transparent ========\r\n");
 
+    /* 先确认模块空闲 */
+    UART1_SendString("[Prepare] Check ESP8266 idle\r\n");
+    ESP8266_SendAT("AT\r\n", "OK", 100);
+    delay_ms(500);
+
+    /* 退出可能残留的透传模式/连接状态 */
+    UART1_SendString("[Prepare] Set normal mode\r\n");
+    ESP8266_SendAT("AT+CIPMODE=0\r\n", "OK", 100);
+    delay_ms(300);
+    UART1_SendString("[Prepare] Close old TCP link\r\n");
+    ESP8266_SendAT("AT+CIPCLOSE\r\n", "OK", 50);
+    delay_ms(1000);
+
     /* Step 4: 单连接模式 */
     UART1_SendString("[Step 4] AT+CIPMUX=0\r\n");
-    if (!ESP8266_SendAT("AT+CIPMUX=0\r\n", "OK", 50))
+    if (!ESP8266_SendAT("AT+CIPMUX=0\r\n", "OK", 100))
     {
         UART1_SendString("-----> Step4 FAIL\r\n");
         return 0;
     }
     UART1_SendString("-----> Step4 OK\r\n");
+    delay_ms(500);
 
-    /* Step 5: 建立 TCP 连接 */
+    /* Step 5: 建立 TCP 连接 (最多重试 3 次) */
     UART1_SendString("[Step 5] AT+CIPSTART\r\n");
-    snprintf(cmd, sizeof(cmd), "AT+CIPSTART=\"TCP\",\"%s\",%d\r\n", serverIP, port);
-    if (!ESP8266_SendAT(cmd, "OK", 200))
+    snprintf(cmd, sizeof(cmd),
+             "AT+CIPSTART=\"TCP\",\"%s\",%d\r\n",
+             serverIP,
+             port);
+    for (i = 0; i < 3; i++)
+    {
+        UART1_SendString("[TCP Try] ");
+        UART1_SendString(cmd);
+        if (ESP8266_SendAT(cmd, "CONNECT", 500))
+        {
+            UART1_SendString("-----> Step5 CONNECT OK\r\n");
+            break;
+        }
+        /* 有些固件返回 ALREADY CONNECT，也算连接存在 */
+        if (strstr((char *)U3_RxBuff, "ALREADY CONNECT") != NULL)
+        {
+            UART1_SendString("-----> Step5 ALREADY CONNECT\r\n");
+            break;
+        }
+        UART1_SendString("-----> Step5 retry...\r\n");
+        ESP8266_SendAT("AT+CIPCLOSE\r\n", "OK", 50);
+        delay_ms(1500);
+    }
+    if (i >= 3)
     {
         UART1_SendString("-----> Step5 FAIL\r\n");
+        UART1_SendString("[Debug] Please check TCP Server, IP, firewall\r\n");
         return 0;
     }
-    UART1_SendString("-----> Step5 OK\r\n");
+    delay_ms(1000);
 
     /* Step 6: 开启透传模式 */
     UART1_SendString("[Step 6] AT+CIPMODE=1\r\n");
-    if (!ESP8266_SendAT("AT+CIPMODE=1\r\n", "OK", 50))
+    if (!ESP8266_SendAT("AT+CIPMODE=1\r\n", "OK", 100))
     {
         UART1_SendString("-----> Step6 FAIL\r\n");
         return 0;
     }
     UART1_SendString("-----> Step6 OK\r\n");
+    delay_ms(500);
 
-    /* Step 7: 进入透传发送 (期望 ">" 提示符) */
+    /* Step 7: 进入透传发送 */
     UART1_SendString("[Step 7] AT+CIPSEND\r\n");
-    if (!ESP8266_SendAT("AT+CIPSEND\r\n", ">", 50))
+    if (!ESP8266_SendAT("AT+CIPSEND\r\n", ">", 200))
     {
         UART1_SendString("-----> Step7 FAIL\r\n");
         return 0;
@@ -200,8 +222,5 @@ uint8_t ESP8266_StartTransparent(char *serverIP, uint16_t port)
     UART1_SendString("-----> Step7 OK\r\n");
 
     UART1_SendString("======== Transparent Mode Active ========\r\n");
-    UART1_SendString("(此后所有 USART3 数据将直接透传到服务器)\r\n");
-    UART1_SendString("(发送 \"+++\" 可退出透传)\r\n");
-
     return 1;
 }

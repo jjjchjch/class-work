@@ -10,6 +10,7 @@
 #include "main.h"
 #include "uart.h"
 #include "delay.h"
+#include "adc.h"
 #include "bsp_LCD_ILI9341.h"
 #include "esp8266.h"
 #include <stdio.h>
@@ -29,7 +30,7 @@
 #define WIFI_PASSWORD "jchzcm123"
 
 /* ---- TCP 透传服务器配置 ---- */
-#define TCP_SERVER_IP   "192.168.15.20"
+#define TCP_SERVER_IP   "172.20.10.3"
 #define TCP_SERVER_PORT 8080
 
 /*===========================================================================
@@ -55,9 +56,11 @@ static void SystemClock_Config(void)
 }
 
 /*===========================================================================
- * 主程序: 仅 ESP8266 WiFi 连接测试
- *         初始化 → AT → CWMODE=1 → CWJAP → CIFSR → 主循环 LED 心跳
+ * 主程序: ESP8266 WiFi 连接测试 + TCP 透传
+ *         初始化 → AT → CWMODE=1 → CWJAP → CIFSR → TCP透传 → 主循环
  *===========================================================================*/
+uint8_t transparent_ok = 0;
+
 int main(void)
 {
     HAL_Init();
@@ -81,6 +84,9 @@ int main(void)
     LCD_Fill(0, 0, 239, 24, BLUE);
     LCD_String(30, 3, (char *)"ESP8266 WiFi Test", 16, WHITE, BLUE);
 
+    /* ---- 光敏传感器 (ADC1, PC1) ---- */
+    adc_init();
+
     /* ---- ESP8266 WiFi (USART3, STA 模式) ---- */
     UART3_Init();
     LCD_String(4, 40, (char *)"WiFi: Connecting...", 16, YELLOW, BLACK);
@@ -88,7 +94,7 @@ int main(void)
     if (ESP8266_Init())
     {
         UART1_SendString("[Main] ESP8266 Init OK, joining AP\r\n");
-        if (ESP8266_JoinAP(WIFI_SSID, WIFI_PASSWORD, 400))
+        if (ESP8266_JoinAP(WIFI_SSID, WIFI_PASSWORD, 1000))
         {
             UART1_SendString("[Main] JoinAP OK\r\n");
             LCD_Fill(0, 40, 239, 56, BLACK);
@@ -100,11 +106,13 @@ int main(void)
             {
                 LCD_String(4, 64, (char *)"TCP: Transparent OK", 16, GREEN, BLACK);
                 UART1_SendString("[Main] Transparent mode active\r\n");
+                transparent_ok = 1;
             }
             else
             {
                 LCD_String(4, 64, (char *)"TCP: Transparent FAIL", 16, RED, BLACK);
                 UART1_SendString("[Main] Transparent mode FAIL\r\n");
+                transparent_ok = 0;
             }
         }
         else
@@ -121,11 +129,21 @@ int main(void)
         LCD_String(4, 40, (char *)"WiFi: No ESP8266", 16, RED, BLACK);
     }
 
-    /* ---- 主循环: 仅 LED 心跳, 不再有其他输出干扰 ---- */
+    /* ---- 主循环: LED 心跳 + 透传数据发送 ---- */
     while (1)
     {
         HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_5);
-        delay_ms(500);
+        if (transparent_ok)
+        {
+            uint16_t adc_val = adc_read();
+            char buf[32];
+            int len = snprintf(buf, sizeof(buf), "Light: %u\r\n", adc_val);
+            if (len > 0)
+            {
+                UART3_SendData((uint8_t *)buf, (uint16_t)len);
+            }
+        }
+        delay_ms(1000);
     }
 }
 
